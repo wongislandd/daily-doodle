@@ -75,6 +75,8 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.koin.composeViewModel)
+            implementation(libs.kermit)
+            implementation(libs.bundles.gitlive)
         }
         nativeMain.dependencies {
             implementation(libs.ktor.client.darwin)
