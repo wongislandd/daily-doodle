@@ -10,7 +10,7 @@ import com.wongislandd.dailydoodle.util.DailyDoodleTopAppBar
 
 @Composable
 fun DrawingBoardScreen(modifier: Modifier = Modifier) {
-    DailyDoodleTopAppBar(title = "Home") {
+    DailyDoodleTopAppBar(title = "Drawing Board") {
         Box(
             modifier = modifier.fillMaxSize()
                 .background(color = MaterialTheme.colors.surface)

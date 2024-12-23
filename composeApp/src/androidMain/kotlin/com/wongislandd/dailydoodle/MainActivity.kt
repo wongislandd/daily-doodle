@@ -12,6 +12,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.wongislandd.nexus.theming.AppTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,11 +26,13 @@ class MainActivity : ComponentActivity() {
             )
         )
         setContent {
-            App(
-                modifier = Modifier
-                    .background(MaterialTheme.colors.primary)
-                    .safeDrawingPadding()
-            )
+            AppTheme {
+                App(
+                    modifier = Modifier
+                        .background(MaterialTheme.colors.primary)
+                        .safeDrawingPadding()
+                )
+            }
         }
     }
 }
