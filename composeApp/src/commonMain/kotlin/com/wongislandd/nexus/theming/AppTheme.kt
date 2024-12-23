@@ -62,8 +62,6 @@ val ThemeColors
 fun AppTheme(content: @Composable () -> Unit) {
     MaterialTheme(
         colors = ThemeColors,
-        typography = MaterialTheme.typography, // Reuse default typography for now
-        shapes = MaterialTheme.shapes, // Reuse default shapes
         content = content
     )
 }

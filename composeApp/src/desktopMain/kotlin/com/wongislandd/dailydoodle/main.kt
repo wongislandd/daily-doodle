@@ -2,7 +2,7 @@ package com.wongislandd.dailydoodle
 
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
-import com.wongislandd.nexus.di.initializeKoin
+import com.wongislandd.dailydoodle.di.initializeKoin
 
 fun main() = application {
 
@@ -12,6 +12,6 @@ fun main() = application {
         onCloseRequest = ::exitApplication,
         title = "dailydoodle",
     ) {
-        DailyDoodleApp()
+        App()
     }
 }

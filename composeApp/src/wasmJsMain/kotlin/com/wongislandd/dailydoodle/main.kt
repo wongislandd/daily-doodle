@@ -10,6 +10,6 @@ fun main() {
     initializeKoin()
 
     ComposeViewport(document.body!!) {
-        DailyDoodleApp()
+        App()
     }
 }

@@ -1,4 +1,4 @@
-package com.wongislandd.nexus.viewmodel
+package com.wongislandd.nexus.events
 
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CoroutineScope
