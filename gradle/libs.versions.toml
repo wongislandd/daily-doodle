@@ -23,6 +23,8 @@ ktor = "3.0.2"
 logback = "1.5.12"
 koinCore = "4.0.0"
 okio = "3.9.1"
+crashlytics = "3.0.2"
+google-services = "4.4.2"
 
 #Gitlive
 firebase-gitlive-sdk = "2.1.0"
@@ -75,6 +77,8 @@ kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 buildkonfig = { id = "com.codingfeline.buildkonfig", version.ref = "buildkonfig" }
+crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "crashlytics" }
+google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
 
 [bundles]
 ktor = [

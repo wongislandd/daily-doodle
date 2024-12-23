@@ -9,7 +9,7 @@ import dev.gitlive.firebase.crashlytics.crashlytics
 import dev.gitlive.firebase.initialize
 import org.koin.core.component.KoinComponent
 
-class InfinityIndexApplication : Application(), KoinComponent {
+class DailyDoodleApplication : Application(), KoinComponent {
 
     private lateinit var analytics: FirebaseAnalytics
 
@@ -20,8 +20,8 @@ class InfinityIndexApplication : Application(), KoinComponent {
     }
 
     private fun initializeFirebase() {
-        analytics = Firebase.analytics
         Firebase.initialize(context = this)
+        analytics = Firebase.analytics
         Firebase.crashlytics.setCrashlyticsCollectionEnabled(true)
     }
 }

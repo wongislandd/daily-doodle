@@ -26,13 +26,11 @@ class MainActivity : ComponentActivity() {
             )
         )
         setContent {
-            AppTheme {
-                DailyDoodleApp(
-                    modifier = Modifier
-                        .background(MaterialTheme.colors.primary)
-                        .safeDrawingPadding()
-                )
-            }
+            DailyDoodleApp(
+                modifier = Modifier
+                    .background(MaterialTheme.colors.primary)
+                    .safeDrawingPadding()
+            )
         }
     }
 }

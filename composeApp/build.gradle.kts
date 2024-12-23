@@ -9,6 +9,8 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.crashlytics)
 }
 
 kotlin {
@@ -59,6 +61,7 @@ kotlin {
             implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
+            implementation(libs.bundles.gitlive)
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -76,7 +79,6 @@ kotlin {
             implementation(libs.koin.compose)
             implementation(libs.koin.composeViewModel)
             implementation(libs.kermit)
-            implementation(libs.bundles.gitlive)
         }
         nativeMain.dependencies {
             implementation(libs.ktor.client.darwin)
