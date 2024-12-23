@@ -10,8 +10,14 @@ abstract class SliceableViewModel(
     val backChannelEventBus: EventBus<BackChannelEvent>
 ) : ViewModel() {
 
-    fun registerSlice(viewModelSlice: ViewModelSlice) {
+    private fun registerSlice(viewModelSlice: ViewModelSlice) {
         viewModelSlice.register(this)
+    }
+
+    fun registerSlices(vararg viewModelSlices: ViewModelSlice) {
+        viewModelSlices.forEach { slice ->
+            registerSlice(slice)
+        }
     }
 
     override fun onCleared() {

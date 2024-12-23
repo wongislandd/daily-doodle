@@ -15,7 +15,7 @@ class AppViewModel(
 ): SliceableViewModel(uiEventBus, backChannelEventBus) {
 
     init {
-        registerSlice(navigationSlice)
+        registerSlices(navigationSlice)
     }
 
     fun navigate(

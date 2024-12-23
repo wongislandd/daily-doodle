@@ -1,6 +1,7 @@
 package com.wongislandd.dailydoodle.di
 
 import com.wongislandd.dailydoodle.AppViewModel
+import com.wongislandd.dailydoodle.drawingboard.drawingModule
 import com.wongislandd.navigation.NavigationSlice
 import com.wongislandd.navigation.supportedNavigationItems
 import com.wongislandd.nexus.di.infraModule
@@ -18,5 +19,5 @@ val appModule = module {
 
 fun initializeKoin(context: Any? = null) =
     startKoin {
-        modules( *infraModule.toTypedArray(), appModule)
+        modules( *infraModule.toTypedArray(), appModule, drawingModule)
     }
