@@ -90,13 +90,15 @@ fun DrawingBoardScreen(modifier: Modifier = Modifier) {
         }
     }
     DailyDoodleTopAppBar(title = "Drawing Board", actions = {
-        IconButton(onClick = { onSendEvent(ImageExported(canvasSize)) }) {
-            Icon(
-                Icons.Default.Share,
-                tint = MaterialTheme.colors.onPrimary,
-                contentDescription = "Export Drawing"
-            )
-        }.takeIf { screenState.isShareEnabled }
+        if (screenState.isShareEnabled) {
+            IconButton(onClick = { onSendEvent(ImageExported(canvasSize)) }) {
+                Icon(
+                    Icons.Default.Share,
+                    tint = MaterialTheme.colors.onPrimary,
+                    contentDescription = "Export Drawing"
+                )
+            }
+        }
     }) {
         when (val canvasState = screenState.canvasState) {
             is Resource.Success -> {
