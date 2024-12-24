@@ -1,5 +1,15 @@
 package com.wongislandd.dailydoodle.drawingboard
 
+import Redo
+import Undo
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,6 +24,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
@@ -32,9 +43,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.dokar.sheets.BottomSheet
-import com.dokar.sheets.BottomSheetState
-import com.dokar.sheets.rememberBottomSheetState
 import com.github.skydoves.colorpicker.compose.AlphaSlider
 import com.github.skydoves.colorpicker.compose.AlphaTile
 import com.github.skydoves.colorpicker.compose.BrightnessSlider
@@ -45,6 +53,8 @@ import com.github.skydoves.colorpicker.compose.rememberColorPickerController
 import com.wongislandd.dailydoodle.util.DailyDoodleTopAppBar
 import com.wongislandd.nexus.events.UiEvent
 import com.wongislandd.nexus.util.Resource
+import com.wongislandd.nexus.util.conditionallyChain
+import com.wongislandd.nexus.util.noIndicationClickable
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.annotation.KoinExperimentalAPI
@@ -55,12 +65,15 @@ fun DrawingBoardScreen(modifier: Modifier = Modifier) {
     val viewModel = koinViewModel<DrawingBoardViewModel>()
     val screenState by viewModel.drawingBoardScreenStateSlice.screenState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
-    val colorSheetState = rememberBottomSheetState()
+    var showColorPicker by remember { mutableStateOf(false) }
     LaunchedEffect(screenState.isColorPickerShown) {
-        if (screenState.isColorPickerShown) {
-            colorSheetState.expand()
-        } else {
-            colorSheetState.collapse()
+        showColorPicker = screenState.isColorPickerShown
+    }
+    val onSendEvent: (UiEvent) -> Unit = { event ->
+        coroutineScope.launch {
+            viewModel.uiEventBus.sendEvent(
+                event
+            )
         }
     }
     DailyDoodleTopAppBar(title = "Drawing Board") {
@@ -76,18 +89,13 @@ fun DrawingBoardScreen(modifier: Modifier = Modifier) {
                         settings = canvasState.data.settings,
                         isUndoAvailable = screenState.isUndoAvailable,
                         isRedoAvailable = screenState.isRedoAvailable,
-                        onSendEvent = { event ->
-                            coroutineScope.launch {
-                                viewModel.uiEventBus.sendEvent(
-                                    event
-                                )
-                            }
-                        },
+                        onSendEvent = onSendEvent,
                         modifier = Modifier.align(Alignment.BottomEnd)
                     )
                     ColorPickerBottomSheet(
-                        sheetState = colorSheetState,
+                        isVisible = showColorPicker,
                         currentColor = canvasState.data.settings.selectedColor,
+                        onDismissRequest = { onSendEvent(DismissColorPicker) },
                         onColorSelected = { color ->
                             coroutineScope.launch {
                                 viewModel.uiEventBus.sendEvent(ColorSelected(color))
@@ -111,8 +119,9 @@ fun DrawingBoardScreen(modifier: Modifier = Modifier) {
 
 @Composable
 private fun ColorPickerBottomSheet(
-    sheetState: BottomSheetState,
+    isVisible: Boolean,
     currentColor: Color,
+    onDismissRequest: () -> Unit,
     onColorSelected: (Color) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -122,51 +131,78 @@ private fun ColorPickerBottomSheet(
     LaunchedEffect(currentColor) {
         controller.selectByColor(currentColor, false)
     }
-    BottomSheet(
-        state = sheetState,
-        modifier = modifier,
-        skipPeeked = true
+    Column(
+        modifier = modifier.fillMaxSize().conditionallyChain(
+            isVisible, Modifier.background(
+                Color.Transparent.copy(alpha = .2f)
+            ).noIndicationClickable { onDismissRequest() }
+        ).conditionallyChain(
+            !isVisible,
+            Modifier.background(Color.Transparent.copy(alpha = 0f))
+        )
     ) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+        Box(modifier = Modifier.fillMaxSize().weight(1f, fill = true))
+        AnimatedVisibility(
+            visible = isVisible,
+            enter = slideInVertically(
+                initialOffsetY = { it / 2 }
+            ) + expandVertically(
+                expandFrom = Alignment.Top
+            ) + fadeIn(
+                initialAlpha = 0.3f
+            ),
+            exit = slideOutVertically(
+                targetOffsetY = { it / 2 }
+            ) + shrinkVertically(
+                shrinkTowards = Alignment.Top
+            ) + fadeOut()
         ) {
-            HsvColorPicker(
-                modifier = modifier
-                    .padding(10.dp)
-                    .size(250.dp),
-                controller = controller,
-                onColorChanged = { colorEnvelope: ColorEnvelope ->
-                    tentativeColor = colorEnvelope.color
-                    hexCode = colorEnvelope.hexCode.uppercase()
-                },
-                initialColor = currentColor
-            )
-            AlphaSlider(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
-                    .height(35.dp),
-                controller = controller,
-            )
-            BrightnessSlider(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(10.dp)
-                    .height(35.dp),
-                controller = controller,
-            )
-            TileColorAndText(
-                controller = controller,
-                colorHex = hexCode,
-                onClick = {
-                    onColorSelected(tentativeColor)
+            Surface(
+                shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
+                color = Color.White,
+                modifier = Modifier.noIndicationClickable()
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.padding(vertical = 16.dp)
+                ) {
+                    HsvColorPicker(
+                        modifier = modifier
+                            .padding(10.dp)
+                            .size(250.dp),
+                        controller = controller,
+                        onColorChanged = { colorEnvelope: ColorEnvelope ->
+                            tentativeColor = colorEnvelope.color
+                            hexCode = colorEnvelope.hexCode.uppercase()
+                        },
+                        initialColor = currentColor
+                    )
+                    AlphaSlider(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp)
+                            .height(35.dp),
+                        controller = controller,
+                    )
+                    BrightnessSlider(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(10.dp)
+                            .height(35.dp),
+                        controller = controller,
+                    )
+                    TileColorAndText(
+                        controller = controller,
+                        colorHex = hexCode,
+                        onClick = {
+                            onColorSelected(tentativeColor)
+                        }
+                    )
                 }
-            )
+            }
         }
     }
-
 }
 
 @Composable
@@ -206,12 +242,27 @@ fun SettingsPanel(
     modifier: Modifier = Modifier
 ) {
     Row(modifier = modifier.padding(16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        UndoAndRedo(
+            isUndoAvailable = isUndoAvailable,
+            isRedoAvailable = isRedoAvailable,
+            onSendEvent = onSendEvent
+        )
+        ColorPickerEntryPoint(settings.selectedColor, { onSendEvent(ShowColorPicker) })
+    }
+}
+
+@Composable
+fun UndoAndRedo(
+    isUndoAvailable: Boolean = false,
+    isRedoAvailable: Boolean = false,
+    onSendEvent: (UiEvent) -> Unit,
+) {
+    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         IconButton(onClick = { onSendEvent(DrawingAction.OnUndo) }, enabled = isUndoAvailable) {
-            Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = null)
+            Icon(Undo, contentDescription = "Undo last action")
         }
         IconButton(onClick = { onSendEvent(DrawingAction.OnRedo) }, enabled = isRedoAvailable) {
-            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null)
+            Icon(Redo, contentDescription = "Redo last action")
         }
-        ColorPickerEntryPoint(settings.selectedColor, { onSendEvent(ShowColorPicker) })
     }
 }
