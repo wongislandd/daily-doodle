@@ -321,10 +321,10 @@ fun UndoAndRedo(
 ) {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         IconButton(onClick = { onSendEvent(DrawingAction.OnUndo) }, enabled = isUndoAvailable) {
-            Icon(Undo, contentDescription = "Undo last action")
+            Icon(Undo, contentDescription = "Undo last action", tint = if (isUndoAvailable) Color.Black else Color.Gray)
         }
         IconButton(onClick = { onSendEvent(DrawingAction.OnRedo) }, enabled = isRedoAvailable) {
-            Icon(Redo, contentDescription = "Redo last action")
+            Icon(Redo, contentDescription = "Redo last action", tint = if (isRedoAvailable) Color.Black else Color.Gray)
         }
     }
 }
