@@ -39,6 +39,7 @@ import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -88,7 +89,15 @@ fun DrawingBoardScreen(modifier: Modifier = Modifier) {
             )
         }
     }
-    DailyDoodleTopAppBar(title = "Drawing Board") {
+    DailyDoodleTopAppBar(title = "Drawing Board", actions = {
+        IconButton(onClick = { onSendEvent(ImageExported(canvasSize)) }) {
+            Icon(
+                Icons.Default.Share,
+                tint = MaterialTheme.colors.onPrimary,
+                contentDescription = "Export Drawing"
+            )
+        }
+    }) {
         when (val canvasState = screenState.canvasState) {
             is Resource.Success -> {
                 Box(modifier = modifier.fillMaxSize().onGloballyPositioned { coordinates ->
@@ -104,9 +113,6 @@ fun DrawingBoardScreen(modifier: Modifier = Modifier) {
                         settings = canvasState.data.settings,
                         isUndoAvailable = canvasState.data.settings.isUndoAvailable,
                         isRedoAvailable = canvasState.data.settings.isRedoAvailable,
-                        onImageExportRequest = {
-                            onSendEvent(ImageExported(canvasSize))
-                        },
                         onSendEvent = onSendEvent,
                         modifier = Modifier.align(Alignment.BottomEnd)
                     )
@@ -459,18 +465,12 @@ fun SettingsPanel(
     settings: CanvasSettings,
     isUndoAvailable: Boolean = false,
     isRedoAvailable: Boolean = false,
-    onImageExportRequest: () -> Unit,
     onSendEvent: (UiEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier.padding(16.dp)
     ) {
-        SettingIconButton(
-            icon = Icons.Default.Favorite,
-            contentDescription = "Save",
-            onClick = onImageExportRequest
-        )
         UndoAndRedo(
             isUndoAvailable = isUndoAvailable,
             isRedoAvailable = isRedoAvailable,
