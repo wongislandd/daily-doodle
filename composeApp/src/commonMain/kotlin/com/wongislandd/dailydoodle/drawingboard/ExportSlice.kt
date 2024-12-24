@@ -9,6 +9,8 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.util.fastForEach
 import com.wongislandd.dailydoodle.sharing.ShareService
 import com.wongislandd.nexus.events.UiEvent
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 data class ImageExported(val size: Size): UiEvent
 
@@ -44,7 +46,8 @@ class ExportSlice(private val shareService: ShareService): CanvasViewModelSlice(
                 )
             }
         }
-        println(bitmap)
-        shareService.share(bitmap)
+        sliceScope.launch(Dispatchers.Default) {
+            shareService.share(bitmap)
+        }
     }
 }

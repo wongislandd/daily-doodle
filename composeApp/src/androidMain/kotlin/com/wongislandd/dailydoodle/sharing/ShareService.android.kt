@@ -7,6 +7,8 @@ import android.graphics.Bitmap
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.core.content.FileProvider
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 
@@ -14,14 +16,16 @@ actual class ShareServiceImpl actual constructor(
     private val appContext: Any?
 ) : ShareService {
 
-    override fun share(image: ImageBitmap) {
+    override suspend fun share(image: ImageBitmap) {
         val realContext = requireNotNull(appContext as Context) {
             "Context must be provided"
         }
         val androidBitMap = image.asAndroidBitmap()
         val file = File(realContext.cacheDir, "daily-doodle-export.png")
-        FileOutputStream(file).use { out ->
-            androidBitMap.compress(Bitmap.CompressFormat.PNG, 100, out)
+        withContext(Dispatchers.IO) {
+            FileOutputStream(file).use { out ->
+                androidBitMap.compress(Bitmap.CompressFormat.PNG, 100, out)
+            }
         }
         shareImage(realContext, file)
     }

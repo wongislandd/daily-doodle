@@ -6,7 +6,7 @@ actual class ShareServiceImpl actual constructor(
     appContext: Any?
 ) : ShareService {
 
-    override fun share(image: ImageBitmap) {
+    override suspend fun share(image: ImageBitmap) {
 
     }
 

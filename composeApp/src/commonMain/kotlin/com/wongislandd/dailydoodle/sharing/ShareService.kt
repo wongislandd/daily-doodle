@@ -3,7 +3,7 @@ package com.wongislandd.dailydoodle.sharing
 import androidx.compose.ui.graphics.ImageBitmap
 
 interface ShareService {
-    fun share(image: ImageBitmap)
+    suspend fun share(image: ImageBitmap)
     fun isShareEnabled(): Boolean
 }
 
