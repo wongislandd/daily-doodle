@@ -7,15 +7,11 @@ import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.toCValues
 import platform.CoreGraphics.CGBitmapContextCreate
 import platform.CoreGraphics.CGBitmapContextCreateImage
-import platform.CoreGraphics.CGBitmapInfo
 import platform.CoreGraphics.CGColorSpaceCreateDeviceRGB
-import platform.CoreGraphics.CGContextFillRect
 import platform.CoreGraphics.CGContextScaleCTM
-import platform.CoreGraphics.CGContextSetRGBFillColor
 import platform.CoreGraphics.CGContextTranslateCTM
 import platform.CoreGraphics.CGFloat
 import platform.CoreGraphics.CGImageAlphaInfo
-import platform.CoreGraphics.CGRectMake
 import platform.Foundation.NSData
 import platform.Foundation.NSString
 import platform.Foundation.NSTemporaryDirectory
