@@ -1,6 +1,7 @@
 package com.wongislandd.dailydoodle.drawingboard
 
 import androidx.compose.ui.graphics.Color
+import com.wongislandd.nexus.util.addWithLimit
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -12,6 +13,7 @@ data class PathState(
 
 data class CanvasSettings(
     val selectedColor: Color = Color(0xFF000000),
+    val colorHistory: List<Color> = emptyList(),
     val isUndoAvailable: Boolean = false,
     val isRedoAvailable: Boolean = false
 )
@@ -30,9 +32,13 @@ class Canvas {
 
     fun updateSelectedColor(color: Color) {
         _state.update {
+            val mutableColorHistory = it.settings.colorHistory.toMutableList()
+            mutableColorHistory.remove(color)
+            val newColorHistory = mutableColorHistory.addWithLimit(color, 10)
             it.copy(
                 settings = it.settings.copy(
-                    selectedColor = color
+                    selectedColor = color,
+                    colorHistory = newColorHistory,
                 )
             )
         }

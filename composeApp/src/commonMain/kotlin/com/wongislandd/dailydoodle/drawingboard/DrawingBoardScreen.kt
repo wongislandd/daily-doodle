@@ -14,12 +14,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -98,6 +100,7 @@ fun DrawingBoardScreen(modifier: Modifier = Modifier) {
                                 viewModel.uiEventBus.sendEvent(ColorSelected(color))
                             }
                         },
+                        colorHistory = canvasState.data.settings.colorHistory
                     )
 
                 }
@@ -118,6 +121,7 @@ fun DrawingBoardScreen(modifier: Modifier = Modifier) {
 private fun ColorPickerBottomSheet(
     isVisible: Boolean,
     currentColor: Color,
+    colorHistory: List<Color>,
     onDismissRequest: () -> Unit,
     onColorSelected: (Color) -> Unit,
     modifier: Modifier = Modifier
@@ -200,8 +204,42 @@ private fun ColorPickerBottomSheet(
                             onColorSelected(tentativeColor)
                         }
                     )
+                    if (colorHistory.isNotEmpty()) {
+                        LabeledComponent(label = "Color History") {
+                            ColorHistory(
+                                colorHistory = colorHistory,
+                                onColorSelected = { color ->
+                                    controller.selectByColor(color, true)
+                                },
+                            )
+                        }
+                    }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun ColorHistory(
+    colorHistory: List<Color>,
+    onColorSelected: (Color) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    LazyRow(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        contentPadding = PaddingValues(16.dp)
+    ) {
+        items(colorHistory.size) { index ->
+            val color = colorHistory[index]
+            AlphaTile(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(RoundedCornerShape(6.dp))
+                    .clickable { onColorSelected(color) },
+                selectedColor = color
+            )
         }
     }
 }
@@ -262,7 +300,10 @@ fun SettingsPanel(
     onSendEvent: (UiEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Row(modifier = modifier.padding(16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    Row(
+        modifier = modifier.padding(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         UndoAndRedo(
             isUndoAvailable = isUndoAvailable,
             isRedoAvailable = isRedoAvailable,
