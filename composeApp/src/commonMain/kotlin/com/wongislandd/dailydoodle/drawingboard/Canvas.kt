@@ -8,9 +8,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 
-enum class DrawingUtencils(val defaultThickness: Dp) {
-    PENCIL(10.dp),
-    ERASER(20.dp)
+enum class DrawingUtencils(val displayName: String, val defaultThickness: Dp) {
+    PENCIL("pencil", 10.dp),
+    ERASER("eraser", 20.dp)
 }
 
 data class PathState(

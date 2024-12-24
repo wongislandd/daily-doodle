@@ -12,6 +12,7 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -100,6 +101,7 @@ fun DrawingBoardScreen(modifier: Modifier = Modifier) {
                     )
                     ThicknessSelectionBottomSheet(
                         isVisible = screenState.isThicknessSelectorShown,
+                        currentTool = canvasState.data.settings.brushSettings.selectedTool,
                         currentThickness = canvasState.data.settings.brushSettings.getThickness(),
                         currentColor = canvasState.data.settings.brushSettings.selectedColor,
                         thicknessHistory = canvasState.data.settings.thicknessHistory,
@@ -134,6 +136,7 @@ fun DrawingBoardScreen(modifier: Modifier = Modifier) {
 @Composable
 private fun SettingBottomSheet(
     isVisible: Boolean,
+    title: String? = null,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
@@ -169,7 +172,18 @@ private fun SettingBottomSheet(
                 color = Color.White,
                 modifier = Modifier.noIndicationClickable()
             ) {
-                content()
+                Column {
+                    title?.let {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = it,
+                            style = MaterialTheme.typography.h6,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(16.dp)
+                        )
+                    }
+                    content()
+                }
             }
         }
     }
@@ -178,6 +192,7 @@ private fun SettingBottomSheet(
 @Composable
 private fun ThicknessSelectionBottomSheet(
     isVisible: Boolean,
+    currentTool: DrawingUtencils,
     currentThickness: Dp,
     currentColor: Color,
     thicknessHistory: List<Dp>,
@@ -186,8 +201,13 @@ private fun ThicknessSelectionBottomSheet(
     modifier: Modifier = Modifier
 ) {
     var tentativeThickness by remember { mutableStateOf(currentThickness) }
+    LaunchedEffect(currentThickness) {
+        tentativeThickness = currentThickness
+    }
+
     SettingBottomSheet(
         isVisible = isVisible,
+        title = "Select ${currentTool.displayName} thickness",
         onDismissRequest = onDismissRequest,
         modifier = modifier
     ) {
@@ -197,10 +217,18 @@ private fun ThicknessSelectionBottomSheet(
         ) {
             Spacer(modifier = Modifier.weight(1f))
             // Dynamic Preview
-            ThicknessPreview(
-                thickness = tentativeThickness,
-                color = currentColor,
-            )
+            when (currentTool) {
+                DrawingUtencils.PENCIL -> ThicknessPreview(
+                    thickness = tentativeThickness,
+                    color = currentColor
+                )
+
+                DrawingUtencils.ERASER -> ThicknessPreview(
+                    thickness = tentativeThickness,
+                    color = Color.White,
+                    modifier = Modifier.border(2.dp, Color.Black, shape = CircleShape)
+                )
+            }
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -214,7 +242,7 @@ private fun ThicknessSelectionBottomSheet(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            if (thicknessHistory.isNotEmpty()) {
+            if (currentTool == DrawingUtencils.PENCIL && thicknessHistory.isNotEmpty()) {
                 LabeledComponent("Previously used") {
                     History(thicknessHistory) { thickness ->
                         Box(modifier = Modifier.sizeIn(minWidth = 36.dp)) {
@@ -267,6 +295,7 @@ private fun ColorPickerBottomSheet(
     }
     SettingBottomSheet(
         isVisible = isVisible,
+        title = "Change colors",
         onDismissRequest = onDismissRequest,
         modifier = modifier
     ) {
@@ -450,6 +479,7 @@ private fun BrushSettingsUI(
             onClick = { onSendEvent(ShowThicknessSelector) }
         )
         ToolSelection(brushSettings.selectedTool, onSendEvent)
+        Spacer(modifier = Modifier.size(16.dp))
         ColorPickerEntryPoint(
             brushSettings.selectedColor,
             { onSendEvent(ShowColorPicker) })
