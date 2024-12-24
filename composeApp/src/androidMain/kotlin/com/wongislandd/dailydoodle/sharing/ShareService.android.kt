@@ -19,7 +19,7 @@ actual class ShareServiceImpl actual constructor(
             "Context must be provided"
         }
         val androidBitMap = image.asAndroidBitmap()
-        val file = File(realContext.cacheDir, "test")
+        val file = File(realContext.cacheDir, "daily-doodle-export.png")
         FileOutputStream(file).use { out ->
             androidBitMap.compress(Bitmap.CompressFormat.PNG, 100, out)
         }
@@ -29,10 +29,9 @@ actual class ShareServiceImpl actual constructor(
     private fun shareImage(context: Context, file: File) {
         val uri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
-            type = "image/jpeg"
+            setDataAndType(uri, "image/png")
             putExtra(Intent.EXTRA_STREAM, uri)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
         // can't launch from application context
         (ActivityRef.current as? Activity)?.startActivity(Intent.createChooser(shareIntent, "Share Image"))

@@ -1,6 +1,7 @@
 package com.wongislandd.dailydoodle.drawingboard
 
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
 import androidx.compose.ui.unit.Density
@@ -32,6 +33,8 @@ class ExportSlice(private val shareService: ShareService): CanvasViewModelSlice(
             canvas = graphicsCanvas,
             size = size
         ) {
+            // Draw an existing white background
+            drawRect(Color.White, size = this.size)
             // Draw existing paths
             pathState.paths.fastForEach { pathData ->
                 drawPath(
