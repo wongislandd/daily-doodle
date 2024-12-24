@@ -9,7 +9,7 @@ class DrawingBoardViewModel(
     val drawingBoardScreenStateSlice: DrawingBoardScreenStateSlice,
     canvas: Canvas,
     canvasPathSlice: CanvasPathSlice,
-    canvasSettingsSlice: DrawingCanvasSettingsSlice,
+    canvasSettingsSlice: ColorSlice,
     uiEventBus: EventBus<UiEvent>,
     backChannelEventBus: EventBus<BackChannelEvent>
 ) : SliceableViewModel(uiEventBus, backChannelEventBus) {

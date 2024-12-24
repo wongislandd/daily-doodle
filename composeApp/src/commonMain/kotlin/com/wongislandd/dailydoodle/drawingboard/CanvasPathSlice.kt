@@ -43,7 +43,7 @@ class CanvasPathSlice : CanvasViewModelSlice() {
             currentPathState.copy(
                 currentPath = PathData(
                     offsets = emptyList(),
-                    color = canvas.state.value.selectedColor
+                    color = canvas.state.value.settings.selectedColor
                 )
             )
         )

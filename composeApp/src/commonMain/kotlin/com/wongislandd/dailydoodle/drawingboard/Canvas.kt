@@ -10,8 +10,12 @@ data class PathState(
     val currentPath: PathData? = null
 )
 
+data class CanvasSettings(
+    val selectedColor: Color = Color(0xFF000000)
+)
+
 data class CanvasState(
-    val selectedColor: Color = Color.Black,
+    val settings: CanvasSettings = CanvasSettings(),
     val pathState: PathState = PathState()
 )
 
@@ -23,7 +27,11 @@ class Canvas {
 
     fun updateSelectedColor(color: Color) {
         _state.update {
-            it.copy(selectedColor = color)
+            it.copy(
+                settings = it.settings.copy(
+                    selectedColor = color
+                )
+            )
         }
     }
 
