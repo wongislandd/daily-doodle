@@ -537,7 +537,7 @@ private fun SettingIconButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
-    IconButton(onClick = onClick, modifier = modifier) {
+    IconButton(onClick = onClick, modifier = modifier, enabled = isEnabled) {
         Icon(
             icon,
             contentDescription = contentDescription,
