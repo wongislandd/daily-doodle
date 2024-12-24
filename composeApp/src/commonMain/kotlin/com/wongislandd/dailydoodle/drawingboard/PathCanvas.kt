@@ -31,7 +31,6 @@ fun PathsCanvas(
     modifier: Modifier = Modifier
 ) {
     val coroutineScope = rememberCoroutineScope()
-
     Canvas(modifier = modifier
         .clipToBounds()
         .fillMaxSize()
@@ -63,7 +62,9 @@ fun PathsCanvas(
                     )
                 }
             )
-        }) {
+        }
+
+    ) {
         // Draw previous paths
         pathState.paths.fastForEach { pathData ->
             drawPath(
@@ -83,7 +84,7 @@ fun PathsCanvas(
     }
 }
 
-private fun DrawScope.drawPath(
+fun DrawScope.drawPath(
     path: List<Offset>,
     color: Color,
     thickness: Dp = 10.dp

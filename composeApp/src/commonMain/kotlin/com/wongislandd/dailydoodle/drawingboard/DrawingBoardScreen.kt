@@ -37,6 +37,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -49,11 +50,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.toSize
 import com.github.skydoves.colorpicker.compose.AlphaSlider
 import com.github.skydoves.colorpicker.compose.AlphaTile
 import com.github.skydoves.colorpicker.compose.BrightnessSlider
@@ -75,6 +79,7 @@ import org.koin.core.annotation.KoinExperimentalAPI
 fun DrawingBoardScreen(modifier: Modifier = Modifier) {
     val viewModel = koinViewModel<DrawingBoardViewModel>()
     val screenState by viewModel.drawingBoardScreenStateSlice.screenState.collectAsState()
+    var canvasSize by remember { mutableStateOf(Size(0f, 0f)) }
     val coroutineScope = rememberCoroutineScope()
     val onSendEvent: (UiEvent) -> Unit = { event ->
         coroutineScope.launch {
@@ -86,7 +91,10 @@ fun DrawingBoardScreen(modifier: Modifier = Modifier) {
     DailyDoodleTopAppBar(title = "Drawing Board") {
         when (val canvasState = screenState.canvasState) {
             is Resource.Success -> {
-                Box(modifier = modifier.fillMaxSize()) {
+                Box(modifier = modifier.fillMaxSize().onGloballyPositioned { coordinates ->
+                    // Retrieve the size of the composable
+                    canvasSize = coordinates.size.toSize()
+                }) {
                     PathsCanvas(
                         canvasState.data.pathState,
                         viewModel.uiEventBus,
@@ -96,6 +104,9 @@ fun DrawingBoardScreen(modifier: Modifier = Modifier) {
                         settings = canvasState.data.settings,
                         isUndoAvailable = canvasState.data.settings.isUndoAvailable,
                         isRedoAvailable = canvasState.data.settings.isRedoAvailable,
+                        onImageExportRequest = {
+                            onSendEvent(ImageExported(canvasSize))
+                        },
                         onSendEvent = onSendEvent,
                         modifier = Modifier.align(Alignment.BottomEnd)
                     )
@@ -448,12 +459,18 @@ fun SettingsPanel(
     settings: CanvasSettings,
     isUndoAvailable: Boolean = false,
     isRedoAvailable: Boolean = false,
+    onImageExportRequest: () -> Unit,
     onSendEvent: (UiEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier.padding(16.dp)
     ) {
+        SettingIconButton(
+            icon = Icons.Default.Favorite,
+            contentDescription = "Save",
+            onClick = onImageExportRequest
+        )
         UndoAndRedo(
             isUndoAvailable = isUndoAvailable,
             isRedoAvailable = isRedoAvailable,
