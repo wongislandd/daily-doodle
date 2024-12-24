@@ -12,13 +12,13 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.wongislandd.dailydoodle.sharing.ActivityRef
+import com.wongislandd.dailydoodle.sharing.ActivityReference
 import com.wongislandd.nexus.theming.AppTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        ActivityRef.current = this
+        ActivityReference.current = this
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.light(
                 Color.TRANSPARENT, Color.TRANSPARENT
@@ -40,7 +40,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        ActivityRef.current = null
+        ActivityReference.current = null
     }
 }
 

@@ -1,5 +1,6 @@
 package com.wongislandd.dailydoodle.drawingboard
 
+import com.wongislandd.dailydoodle.sharing.ShareService
 import com.wongislandd.nexus.events.BackChannelEvent
 import com.wongislandd.nexus.events.Event
 import com.wongislandd.nexus.events.UiEvent
@@ -15,11 +16,13 @@ object ShowThicknessSelector : BackChannelEvent, UiEvent
 object DismissColorPicker : BackChannelEvent, UiEvent
 object ShowColorPicker : BackChannelEvent, UiEvent
 
-class DrawingBoardScreenStateSlice : CanvasViewModelSlice() {
+class DrawingBoardScreenStateSlice(shareService: ShareService) : CanvasViewModelSlice() {
 
     private val _screenState: MutableStateFlow<DrawingBoardScreenState> =
         MutableStateFlow(
-            DrawingBoardScreenState()
+            DrawingBoardScreenState(
+                isShareEnabled = shareService.isShareEnabled()
+            )
         )
     val screenState: StateFlow<DrawingBoardScreenState> = _screenState
 

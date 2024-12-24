@@ -9,4 +9,6 @@ actual class ShareServiceImpl actual constructor(
     override fun share(image: ImageBitmap) {
 
     }
+
+    override fun isShareEnabled(): Boolean = false
 }

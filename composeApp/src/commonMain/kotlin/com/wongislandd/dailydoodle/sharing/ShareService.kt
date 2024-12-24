@@ -4,9 +4,11 @@ import androidx.compose.ui.graphics.ImageBitmap
 
 interface ShareService {
     fun share(image: ImageBitmap)
+    fun isShareEnabled(): Boolean
 }
 
-object ActivityRef {
+// not ideal lol
+object ActivityReference {
     var current: Any? = null
 }
 

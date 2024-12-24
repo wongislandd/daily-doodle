@@ -96,7 +96,7 @@ fun DrawingBoardScreen(modifier: Modifier = Modifier) {
                 tint = MaterialTheme.colors.onPrimary,
                 contentDescription = "Export Drawing"
             )
-        }
+        }.takeIf { screenState.isShareEnabled }
     }) {
         when (val canvasState = screenState.canvasState) {
             is Resource.Success -> {

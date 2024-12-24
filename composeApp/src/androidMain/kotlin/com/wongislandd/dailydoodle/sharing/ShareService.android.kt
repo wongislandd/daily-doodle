@@ -26,6 +26,8 @@ actual class ShareServiceImpl actual constructor(
         shareImage(realContext, file)
     }
 
+    override fun isShareEnabled(): Boolean = true
+
     private fun shareImage(context: Context, file: File) {
         val uri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
@@ -34,6 +36,6 @@ actual class ShareServiceImpl actual constructor(
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
         // can't launch from application context
-        (ActivityRef.current as? Activity)?.startActivity(Intent.createChooser(shareIntent, "Share Image"))
+        (ActivityReference.current as? Activity)?.startActivity(Intent.createChooser(shareIntent, "Share Image"))
     }
 }
