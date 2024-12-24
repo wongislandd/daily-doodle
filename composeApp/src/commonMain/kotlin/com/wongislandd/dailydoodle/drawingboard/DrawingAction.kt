@@ -7,4 +7,6 @@ sealed interface DrawingAction: UiEvent {
     data object OnNewPathStart: DrawingAction
     data class OnDraw(val offset: Offset): DrawingAction
     data object OnNewPathEnd: DrawingAction
+    data object OnUndo: DrawingAction
+    data object OnRedo: DrawingAction
 }

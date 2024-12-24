@@ -17,10 +17,7 @@ class DrawingBoardScreenStateSlice : CanvasViewModelSlice() {
 
     private val _screenState: MutableStateFlow<DrawingBoardScreenState> =
         MutableStateFlow(
-            DrawingBoardScreenState(
-                canvasState = Resource.Loading(),
-                isColorPickerShown = false
-            )
+            DrawingBoardScreenState()
         )
     val screenState: StateFlow<DrawingBoardScreenState> = _screenState
 
@@ -44,7 +41,15 @@ class DrawingBoardScreenStateSlice : CanvasViewModelSlice() {
 
     override fun handleBackChannelEvent(event: BackChannelEvent) {
         super.handleBackChannelEvent(event)
-       handleGeneralEvent(event)
+        handleGeneralEvent(event)
+        when (event) {
+            is ToggleRedoAvailability -> _screenState.update {
+                it.copy(isRedoAvailable = event.isAvailable)
+            }
+            is ToggleUndoAvailability -> _screenState.update {
+                it.copy(isUndoAvailable = event.isAvailable)
+            }
+        }
     }
 
     private fun handleGeneralEvent(event: Event) {

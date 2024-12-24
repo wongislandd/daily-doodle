@@ -4,14 +4,20 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -37,6 +43,7 @@ import com.github.skydoves.colorpicker.compose.ColorPickerController
 import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
 import com.wongislandd.dailydoodle.util.DailyDoodleTopAppBar
+import com.wongislandd.nexus.events.UiEvent
 import com.wongislandd.nexus.util.Resource
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
@@ -67,10 +74,12 @@ fun DrawingBoardScreen(modifier: Modifier = Modifier) {
                     )
                     SettingsPanel(
                         settings = canvasState.data.settings,
-                        onColorPickerEntryPointClick = {
+                        isUndoAvailable = screenState.isUndoAvailable,
+                        isRedoAvailable = screenState.isRedoAvailable,
+                        onSendEvent = { event ->
                             coroutineScope.launch {
                                 viewModel.uiEventBus.sendEvent(
-                                    ShowColorPicker
+                                    event
                                 )
                             }
                         },
@@ -191,10 +200,18 @@ private fun TileColorAndText(
 @Composable
 fun SettingsPanel(
     settings: CanvasSettings,
-    onColorPickerEntryPointClick: () -> Unit,
+    isUndoAvailable: Boolean = false,
+    isRedoAvailable: Boolean = false,
+    onSendEvent: (UiEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        ColorPickerEntryPoint(settings.selectedColor, onClick = onColorPickerEntryPointClick)
+    Row(modifier = modifier.padding(16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        IconButton(onClick = { onSendEvent(DrawingAction.OnUndo) }, enabled = isUndoAvailable) {
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = null)
+        }
+        IconButton(onClick = { onSendEvent(DrawingAction.OnRedo) }, enabled = isRedoAvailable) {
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null)
+        }
+        ColorPickerEntryPoint(settings.selectedColor, { onSendEvent(ShowColorPicker) })
     }
 }
