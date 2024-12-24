@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -37,7 +38,6 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
@@ -90,8 +90,16 @@ fun DrawingBoardScreen(modifier: Modifier = Modifier) {
         }
     }
     DailyDoodleTopAppBar(title = "Drawing Board", actions = {
-        if (screenState.isShareEnabled) {
-            IconButton(onClick = { onSendEvent(ImageExported(canvasSize)) }) {
+        if (screenState.shareState.isSharing) {
+            IconButton(onClick = {}) {
+                CircularProgressIndicator(
+                    color = MaterialTheme.colors.onPrimary,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        }
+        if (screenState.shareState.isShareEnabled) {
+            IconButton(onClick = { onSendEvent(ImageExportRequest(canvasSize)) }) {
                 Icon(
                     Icons.Default.Share,
                     tint = MaterialTheme.colors.onPrimary,

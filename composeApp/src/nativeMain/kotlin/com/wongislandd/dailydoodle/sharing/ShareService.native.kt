@@ -5,6 +5,8 @@ import androidx.compose.ui.graphics.toPixelMap
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.toCValues
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.withContext
 import platform.CoreGraphics.CGBitmapContextCreate
 import platform.CoreGraphics.CGBitmapContextCreateImage
@@ -30,9 +32,10 @@ import platform.UIKit.UIImageJPEGRepresentation
 actual class ShareServiceImpl actual constructor(
     appContext: Any?
 ) : ShareService {
-    override suspend fun share(image: ImageBitmap) {
+    override suspend fun share(image: ImageBitmap, shareProgressListener: ShareProgressListener) {
+        shareProgressListener.onShareStart()
         // Convert the bitmap into a UIImage
-        val uiImage = image.toUIImage()
+        val uiImage = image.toUIImage(shareProgressListener)
         // Save the UIImage to a temporary file
         val tempDir = NSTemporaryDirectory()
         val tempFile = NSString.stringWithString("$tempDir/daily-doodle-share.jpg")
@@ -54,6 +57,7 @@ actual class ShareServiceImpl actual constructor(
                 animated = true,
                 completion = null
             )
+            shareProgressListener.onShareReady()
         }
     }
 
@@ -61,7 +65,7 @@ actual class ShareServiceImpl actual constructor(
 }
 
 @OptIn(ExperimentalForeignApi::class)
-fun ImageBitmap.toUIImage(): UIImage {
+fun ImageBitmap.toUIImage(shareProgressListener: ShareProgressListener): UIImage {
     val pixelMap = this.toPixelMap()
     val width = pixelMap.width
     val height = pixelMap.height
@@ -86,6 +90,7 @@ fun ImageBitmap.toUIImage(): UIImage {
 
     // Draw the pixels into the CGContext
     for (y in 0 until height) {
+        shareProgressListener.onProgress(y.toFloat() / height.toFloat())
         for (x in 0 until width) {
             val color = pixelMap[x, y]
             val components = color.toRgbaComponents()

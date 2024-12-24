@@ -16,11 +16,13 @@ actual class ShareServiceImpl actual constructor(
     private val appContext: Any?
 ) : ShareService {
 
-    override suspend fun share(image: ImageBitmap) {
+    override suspend fun share(image: ImageBitmap, shareProgressListener: ShareProgressListener) {
+        shareProgressListener.onShareStart()
         val realContext = requireNotNull(appContext as Context) {
             "Context must be provided"
         }
         val androidBitMap = image.asAndroidBitmap()
+        shareProgressListener.onProgress(.5f)
         val file = File(realContext.cacheDir, "daily-doodle-export.png")
         withContext(Dispatchers.IO) {
             FileOutputStream(file).use { out ->
@@ -28,6 +30,7 @@ actual class ShareServiceImpl actual constructor(
             }
         }
         shareImage(realContext, file)
+        shareProgressListener.onShareReady()
     }
 
     override fun isShareEnabled(): Boolean = true

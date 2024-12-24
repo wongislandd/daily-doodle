@@ -21,7 +21,9 @@ class DrawingBoardScreenStateSlice(shareService: ShareService) : CanvasViewModel
     private val _screenState: MutableStateFlow<DrawingBoardScreenState> =
         MutableStateFlow(
             DrawingBoardScreenState(
-                isShareEnabled = shareService.isShareEnabled()
+                shareState = ShareState(
+                    isShareEnabled = shareService.isShareEnabled()
+                )
             )
         )
     val screenState: StateFlow<DrawingBoardScreenState> = _screenState
@@ -42,6 +44,18 @@ class DrawingBoardScreenStateSlice(shareService: ShareService) : CanvasViewModel
     override fun handleUiEvent(event: UiEvent) {
         super.handleUiEvent(event)
         handleGeneralEvent(event)
+    }
+
+    override fun handleBackChannelEvent(event: BackChannelEvent) {
+        super.handleBackChannelEvent(event)
+        handleGeneralEvent(event)
+        when (event) {
+            is ShareStateUpdate -> _screenState.update {
+                it.copy(
+                    shareState = event.shareState
+                )
+            }
+        }
     }
 
     private fun handleGeneralEvent(event: Event) {
