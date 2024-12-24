@@ -84,8 +84,8 @@ fun DrawingBoardScreen(modifier: Modifier = Modifier) {
                     )
                     SettingsPanel(
                         settings = canvasState.data.settings,
-                        isUndoAvailable = screenState.isUndoAvailable,
-                        isRedoAvailable = screenState.isRedoAvailable,
+                        isUndoAvailable = canvasState.data.settings.isUndoAvailable,
+                        isRedoAvailable = canvasState.data.settings.isRedoAvailable,
                         onSendEvent = onSendEvent,
                         modifier = Modifier.align(Alignment.BottomEnd)
                     )

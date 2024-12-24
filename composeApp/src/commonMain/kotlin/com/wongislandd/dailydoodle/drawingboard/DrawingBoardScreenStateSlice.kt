@@ -39,19 +39,6 @@ class DrawingBoardScreenStateSlice : CanvasViewModelSlice() {
         handleGeneralEvent(event)
     }
 
-    override fun handleBackChannelEvent(event: BackChannelEvent) {
-        super.handleBackChannelEvent(event)
-        handleGeneralEvent(event)
-        when (event) {
-            is ToggleRedoAvailability -> _screenState.update {
-                it.copy(isRedoAvailable = event.isAvailable)
-            }
-            is ToggleUndoAvailability -> _screenState.update {
-                it.copy(isUndoAvailable = event.isAvailable)
-            }
-        }
-    }
-
     private fun handleGeneralEvent(event: Event) {
         when (event) {
             is DismissColorPicker -> _screenState.update {

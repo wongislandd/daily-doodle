@@ -11,12 +11,15 @@ data class PathState(
 )
 
 data class CanvasSettings(
-    val selectedColor: Color = Color(0xFF000000)
+    val selectedColor: Color = Color(0xFF000000),
+    val isUndoAvailable: Boolean = false,
+    val isRedoAvailable: Boolean = false
 )
 
 data class CanvasState(
     val settings: CanvasSettings = CanvasSettings(),
-    val pathState: PathState = PathState()
+    val pathState: PathState = PathState(),
+    val undoStack: List<PathData> = emptyList()
 )
 
 class Canvas {
@@ -37,7 +40,30 @@ class Canvas {
 
     fun updatePathState(pathState: PathState) {
         _state.update {
-            it.copy(pathState = pathState)
+            val newCanvasState = it.copy(pathState = pathState)
+            checkForUndoRedoAvailability(newCanvasState)
+            newCanvasState
+        }
+    }
+
+    fun updateUndoStack(undoStack: List<PathData>) {
+        _state.update {
+            val newCanvasState = it.copy(undoStack = undoStack)
+            checkForUndoRedoAvailability(newCanvasState)
+            newCanvasState
+        }
+    }
+
+    private fun checkForUndoRedoAvailability(
+        newCanvasState: CanvasState
+    ) {
+        val shouldRedoBeAvailable = newCanvasState.undoStack.isNotEmpty()
+        val shouldUndoBeAvailable = newCanvasState.pathState.paths.isNotEmpty()
+        _state.update {
+            it.copy(settings = it.settings.copy(isRedoAvailable = shouldRedoBeAvailable))
+        }
+        _state.update {
+            it.copy(settings = it.settings.copy(isUndoAvailable = shouldUndoBeAvailable))
         }
     }
 }

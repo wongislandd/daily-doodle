@@ -2,19 +2,11 @@ package com.wongislandd.dailydoodle.drawingboard
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import com.wongislandd.nexus.events.BackChannelEvent
 import com.wongislandd.nexus.events.UiEvent
-import kotlinx.coroutines.launch
 
 data class PathData(val offsets: List<Offset>, val color: Color)
 
-data class ToggleRedoAvailability(val isAvailable: Boolean) : BackChannelEvent
-data class ToggleUndoAvailability(val isAvailable: Boolean) : BackChannelEvent
-
-// TODO Tie the availability of undo/redo tighter to its value (e.g. empty undo stack/path stack)
 class CanvasPathSlice : CanvasViewModelSlice() {
-
-    private val _undoStack = ArrayDeque<PathData>()
 
     override fun handleUiEvent(event: UiEvent) {
         if (event is DrawingAction) {
@@ -31,17 +23,12 @@ class CanvasPathSlice : CanvasViewModelSlice() {
     private fun onNewPathEnd() {
         val currentPath: PathData = canvas.state.value.pathState.currentPath ?: return
         val newPaths = canvas.state.value.pathState.paths + currentPath
-        if (newPaths.size == 1) {
-            sliceScope.launch {
-                backChannelEvents.sendEvent(ToggleUndoAvailability(true))
-            }
-        }
         val newPathState = canvas.state.value.pathState.copy(
             paths = newPaths,
             currentPath = null
         )
         canvas.updatePathState(newPathState)
-        clearUndoStack()
+        canvas.updateUndoStack(emptyList())
     }
 
     private fun onDraw(offset: Offset) {
@@ -70,51 +57,18 @@ class CanvasPathSlice : CanvasViewModelSlice() {
 
     private fun onUndo() {
         val currentPaths = canvas.state.value.pathState.paths
-        if (currentPaths.size == 1) {
-            sliceScope.launch {
-                backChannelEvents.sendEvent(ToggleUndoAvailability(false))
-            }
-        }
         if (currentPaths.isEmpty()) return
         val lastPath = currentPaths[currentPaths.lastIndex]
         val newPaths = currentPaths.dropLast(1)
-        pushUndoStack(lastPath)
+        canvas.updateUndoStack(canvas.state.value.undoStack + lastPath)
         canvas.updatePathState(canvas.state.value.pathState.copy(paths = newPaths))
     }
 
     private fun onRedo() {
-        val pathToRedo = popUndoStack() ?: return
+        val latestUndo = canvas.state.value.undoStack.lastOrNull() ?: return
+        canvas.updateUndoStack(canvas.state.value.undoStack.dropLast(1))
         val pathState = canvas.state.value.pathState
-        val updatedPathState = pathState.copy(paths = pathState.paths + pathToRedo)
+        val updatedPathState = pathState.copy(paths = pathState.paths + latestUndo)
         canvas.updatePathState(updatedPathState)
-        sliceScope.launch {
-            backChannelEvents.sendEvent(ToggleUndoAvailability(true))
-        }
-    }
-
-    private fun pushUndoStack(pathData: PathData) {
-        _undoStack.add(pathData)
-        if (_undoStack.size == 1) {
-            sliceScope.launch {
-                backChannelEvents.sendEvent(ToggleRedoAvailability(true))
-            }
-        }
-    }
-
-    private fun popUndoStack(): PathData? {
-        val latestUndo = _undoStack.removeLastOrNull()
-        if (_undoStack.isEmpty()) {
-            sliceScope.launch {
-                backChannelEvents.sendEvent(ToggleRedoAvailability(false))
-            }
-        }
-        return latestUndo
-    }
-
-    private fun clearUndoStack() {
-        _undoStack.clear()
-        sliceScope.launch {
-            backChannelEvents.sendEvent(ToggleRedoAvailability(false))
-        }
     }
 }
