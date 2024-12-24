@@ -26,9 +26,6 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -178,20 +175,24 @@ private fun ColorPickerBottomSheet(
                         },
                         initialColor = currentColor
                     )
-                    AlphaSlider(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(10.dp)
-                            .height(35.dp),
-                        controller = controller,
-                    )
-                    BrightnessSlider(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(10.dp)
-                            .height(35.dp),
-                        controller = controller,
-                    )
+                    LabeledComponent(label = "Alpha") {
+                        AlphaSlider(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(10.dp)
+                                .height(35.dp),
+                            controller = controller,
+                        )
+                    }
+                    LabeledComponent(label = "Brightness") {
+                        BrightnessSlider(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(10.dp)
+                                .height(35.dp),
+                            controller = controller,
+                        )
+                    }
                     TileColorAndText(
                         controller = controller,
                         colorHex = hexCode,
@@ -202,6 +203,26 @@ private fun ColorPickerBottomSheet(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun LabeledComponent(
+    label: String,
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.body2,
+            fontWeight = FontWeight.Bold,
+        )
+        content()
     }
 }
 
