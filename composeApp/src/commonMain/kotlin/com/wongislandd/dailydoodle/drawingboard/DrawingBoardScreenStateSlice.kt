@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+object DismissThicknessSelector : BackChannelEvent, UiEvent
+object ShowThicknessSelector : BackChannelEvent, UiEvent
 object DismissColorPicker : BackChannelEvent, UiEvent
 object ShowColorPicker : BackChannelEvent, UiEvent
 
@@ -47,6 +49,13 @@ class DrawingBoardScreenStateSlice : CanvasViewModelSlice() {
 
             is ShowColorPicker -> _screenState.update {
                 it.copy(isColorPickerShown = true)
+            }
+            is DismissThicknessSelector -> _screenState.update {
+                it.copy(isThicknessSelectorShown = false)
+            }
+
+            is ShowThicknessSelector -> _screenState.update {
+                it.copy(isThicknessSelectorShown = true)
             }
         }
     }

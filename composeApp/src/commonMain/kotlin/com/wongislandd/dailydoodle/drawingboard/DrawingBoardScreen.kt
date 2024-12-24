@@ -1,5 +1,7 @@
 package com.wongislandd.dailydoodle.drawingboard
 
+import Eraser
+import Pencil
 import Redo
 import Undo
 import androidx.compose.animation.AnimatedVisibility
@@ -16,18 +18,25 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Slider
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -40,7 +49,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.github.skydoves.colorpicker.compose.AlphaSlider
 import com.github.skydoves.colorpicker.compose.AlphaTile
@@ -64,10 +75,6 @@ fun DrawingBoardScreen(modifier: Modifier = Modifier) {
     val viewModel = koinViewModel<DrawingBoardViewModel>()
     val screenState by viewModel.drawingBoardScreenStateSlice.screenState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
-    var showColorPicker by remember { mutableStateOf(false) }
-    LaunchedEffect(screenState.isColorPickerShown) {
-        showColorPicker = screenState.isColorPickerShown
-    }
     val onSendEvent: (UiEvent) -> Unit = { event ->
         coroutineScope.launch {
             viewModel.uiEventBus.sendEvent(
@@ -91,9 +98,17 @@ fun DrawingBoardScreen(modifier: Modifier = Modifier) {
                         onSendEvent = onSendEvent,
                         modifier = Modifier.align(Alignment.BottomEnd)
                     )
+                    ThicknessSelectionBottomSheet(
+                        isVisible = screenState.isThicknessSelectorShown,
+                        currentThickness = canvasState.data.settings.brushSettings.getThickness(),
+                        currentColor = canvasState.data.settings.brushSettings.selectedColor,
+                        thicknessHistory = canvasState.data.settings.thicknessHistory,
+                        onDismissRequest = { onSendEvent(DismissThicknessSelector) },
+                        onThicknessChange = { thickness -> onSendEvent(ThicknessSelected(thickness)) }
+                    )
                     ColorPickerBottomSheet(
-                        isVisible = showColorPicker,
-                        currentColor = canvasState.data.settings.selectedColor,
+                        isVisible = screenState.isColorPickerShown,
+                        currentColor = canvasState.data.settings.brushSettings.selectedColor,
                         onDismissRequest = { onSendEvent(DismissColorPicker) },
                         onColorSelected = { color ->
                             coroutineScope.launch {
@@ -102,7 +117,6 @@ fun DrawingBoardScreen(modifier: Modifier = Modifier) {
                         },
                         colorHistory = canvasState.data.settings.colorHistory
                     )
-
                 }
             }
 
@@ -118,20 +132,12 @@ fun DrawingBoardScreen(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun ColorPickerBottomSheet(
+private fun SettingBottomSheet(
     isVisible: Boolean,
-    currentColor: Color,
-    colorHistory: List<Color>,
     onDismissRequest: () -> Unit,
-    onColorSelected: (Color) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit,
 ) {
-    val controller = rememberColorPickerController()
-    var tentativeColor by remember { mutableStateOf(currentColor) }
-    var hexCode by remember { mutableStateOf("") }
-    LaunchedEffect(currentColor) {
-        controller.selectByColor(currentColor, false)
-    }
     Column(
         modifier = modifier.fillMaxSize().conditionallyChain(
             isVisible, Modifier.background(
@@ -163,58 +169,163 @@ private fun ColorPickerBottomSheet(
                 color = Color.White,
                 modifier = Modifier.noIndicationClickable()
             ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    modifier = Modifier.padding(vertical = 16.dp)
-                ) {
-                    HsvColorPicker(
-                        modifier = modifier
-                            .padding(10.dp)
-                            .size(250.dp),
-                        controller = controller,
-                        onColorChanged = { colorEnvelope: ColorEnvelope ->
-                            tentativeColor = colorEnvelope.color
-                            hexCode = colorEnvelope.hexCode.uppercase()
-                        },
-                        initialColor = currentColor
-                    )
-                    LabeledComponent(label = "Alpha") {
-                        AlphaSlider(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(10.dp)
-                                .height(35.dp),
-                            controller = controller,
-                        )
-                    }
-                    LabeledComponent(label = "Brightness") {
-                        BrightnessSlider(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(10.dp)
-                                .height(35.dp),
-                            controller = controller,
-                        )
-                    }
-                    TileColorAndText(
-                        controller = controller,
-                        colorHex = hexCode,
-                        onClick = {
-                            onColorSelected(tentativeColor)
-                        }
-                    )
-                    if (colorHistory.isNotEmpty()) {
-                        LabeledComponent(label = "Color History") {
-                            ColorHistory(
-                                colorHistory = colorHistory,
-                                onColorSelected = { color ->
-                                    controller.selectByColor(color, true)
-                                },
+                content()
+            }
+        }
+    }
+}
+
+@Composable
+private fun ThicknessSelectionBottomSheet(
+    isVisible: Boolean,
+    currentThickness: Dp,
+    currentColor: Color,
+    thicknessHistory: List<Dp>,
+    onDismissRequest: () -> Unit,
+    onThicknessChange: (Dp) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var tentativeThickness by remember { mutableStateOf(currentThickness) }
+    SettingBottomSheet(
+        isVisible = isVisible,
+        onDismissRequest = onDismissRequest,
+        modifier = modifier
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.height(300.dp).fillMaxWidth().padding(16.dp)
+        ) {
+            Spacer(modifier = Modifier.weight(1f))
+            // Dynamic Preview
+            ThicknessPreview(
+                thickness = tentativeThickness,
+                color = currentColor,
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Slider(
+                value = tentativeThickness.value,
+                onValueChange = {
+                    tentativeThickness = it.dp
+                },
+                valueRange = 5f..50f // control min and max thickness here
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            if (thicknessHistory.isNotEmpty()) {
+                LabeledComponent("Previously used") {
+                    History(thicknessHistory) { thickness ->
+                        Box(modifier = Modifier.sizeIn(minWidth = 36.dp)) {
+                            ThicknessPreview(
+                                thickness = thickness,
+                                color = currentColor,
+                                modifier = Modifier.clickable {
+                                    tentativeThickness = thickness
+                                }.align(Alignment.Center)
                             )
                         }
                     }
                 }
+            }
+
+            TextButton(onClick = {
+                onThicknessChange(tentativeThickness)
+                onDismissRequest()
+            }) {
+                Text(text = "Confirm")
+            }
+        }
+    }
+}
+
+@Composable
+private fun ThicknessPreview(thickness: Dp, color: Color, modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .size(thickness)
+            .clip(CircleShape)
+            .background(color = color)
+    )
+}
+
+@Composable
+private fun ColorPickerBottomSheet(
+    isVisible: Boolean,
+    currentColor: Color,
+    colorHistory: List<Color>,
+    onDismissRequest: () -> Unit,
+    onColorSelected: (Color) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val controller = rememberColorPickerController()
+    var tentativeColor by remember { mutableStateOf(currentColor) }
+    var hexCode by remember { mutableStateOf("") }
+    LaunchedEffect(currentColor) {
+        controller.selectByColor(currentColor, false)
+    }
+    SettingBottomSheet(
+        isVisible = isVisible,
+        onDismissRequest = onDismissRequest,
+        modifier = modifier
+    ) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.padding(vertical = 16.dp)
+        ) {
+            HsvColorPicker(
+                modifier = modifier
+                    .padding(10.dp)
+                    .size(250.dp),
+                controller = controller,
+                onColorChanged = { colorEnvelope: ColorEnvelope ->
+                    tentativeColor = colorEnvelope.color
+                    hexCode = colorEnvelope.hexCode.uppercase()
+                },
+                initialColor = currentColor
+            )
+            LabeledComponent(label = "Alpha") {
+                AlphaSlider(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp)
+                        .height(35.dp),
+                    controller = controller,
+                )
+            }
+            LabeledComponent(label = "Brightness") {
+                BrightnessSlider(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp)
+                        .height(35.dp),
+                    controller = controller,
+                )
+            }
+            TileColorAndText(
+                controller = controller,
+                colorHex = hexCode,
+                onClick = {
+                    onColorSelected(tentativeColor)
+                }
+            )
+            if (colorHistory.isNotEmpty()) {
+                LabeledComponent(label = "Previously used") {
+                    ColorHistory(
+                        colorHistory = colorHistory,
+                        onColorSelected = { color ->
+                            controller.selectByColor(color, true)
+                        },
+                    )
+                }
+            }
+            TextButton(onClick = {
+                onColorSelected(tentativeColor)
+                onDismissRequest()
+            }) {
+                Text(text = "Confirm")
             }
         }
     }
@@ -226,20 +337,31 @@ private fun ColorHistory(
     onColorSelected: (Color) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    History(colorHistory, modifier = modifier) { color ->
+        AlphaTile(
+            modifier = Modifier
+                .size(40.dp)
+                .clip(RoundedCornerShape(6.dp))
+                .clickable { onColorSelected(color) },
+            selectedColor = color
+        )
+    }
+}
+
+@Composable
+private fun <T> History(
+    historyEntries: List<T>,
+    modifier: Modifier = Modifier,
+    content: @Composable (T) -> Unit
+) {
     LazyRow(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalAlignment = Alignment.CenterVertically,
         contentPadding = PaddingValues(16.dp)
     ) {
-        items(colorHistory.size) { index ->
-            val color = colorHistory[index]
-            AlphaTile(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(RoundedCornerShape(6.dp))
-                    .clickable { onColorSelected(color) },
-                selectedColor = color
-            )
+        items(historyEntries.size) { index ->
+            content(historyEntries[index])
         }
     }
 }
@@ -301,30 +423,95 @@ fun SettingsPanel(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.padding(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        modifier = modifier.padding(16.dp)
     ) {
         UndoAndRedo(
             isUndoAvailable = isUndoAvailable,
             isRedoAvailable = isRedoAvailable,
             onSendEvent = onSendEvent
         )
-        ColorPickerEntryPoint(settings.selectedColor, { onSendEvent(ShowColorPicker) })
+        BrushSettingsUI(
+            brushSettings = settings.brushSettings,
+            onSendEvent = onSendEvent
+        )
     }
 }
 
 @Composable
-fun UndoAndRedo(
+private fun BrushSettingsUI(
+    brushSettings: BrushSettings,
+    onSendEvent: (UiEvent) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(modifier = modifier) {
+        SettingIconButton(
+            icon = Icons.Default.Settings,
+            contentDescription = "Change brush settings",
+            onClick = { onSendEvent(ShowThicknessSelector) }
+        )
+        ToolSelection(brushSettings.selectedTool, onSendEvent)
+        ColorPickerEntryPoint(
+            brushSettings.selectedColor,
+            { onSendEvent(ShowColorPicker) })
+    }
+}
+
+@Composable
+private fun ToolSelection(
+    selectedTool: DrawingUtencils,
+    onSendEvent: (UiEvent) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val toolIcon = when (selectedTool) {
+        DrawingUtencils.PENCIL -> Pencil
+        DrawingUtencils.ERASER -> Eraser
+    }
+    SettingIconButton(
+        toolIcon,
+        "Currently selected tool: ${selectedTool.name}",
+        isEnabled = true,
+        modifier = modifier,
+        onClick = {
+            onSendEvent(
+                ToolSelected(
+                    if (selectedTool == DrawingUtencils.PENCIL) DrawingUtencils.ERASER else DrawingUtencils.PENCIL
+                )
+            )
+        }
+    )
+}
+
+@Composable
+private fun UndoAndRedo(
     isUndoAvailable: Boolean = false,
     isRedoAvailable: Boolean = false,
     onSendEvent: (UiEvent) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        IconButton(onClick = { onSendEvent(DrawingAction.OnUndo) }, enabled = isUndoAvailable) {
-            Icon(Undo, contentDescription = "Undo last action", tint = if (isUndoAvailable) Color.Black else Color.Gray)
+    Row(modifier = modifier) {
+        SettingIconButton(Undo, "Undo last action", isUndoAvailable) {
+            onSendEvent(DrawingAction.OnUndo)
         }
-        IconButton(onClick = { onSendEvent(DrawingAction.OnRedo) }, enabled = isRedoAvailable) {
-            Icon(Redo, contentDescription = "Redo last action", tint = if (isRedoAvailable) Color.Black else Color.Gray)
+        SettingIconButton(Redo, "Redo last action", isRedoAvailable) {
+            onSendEvent(DrawingAction.OnRedo)
         }
+
+    }
+}
+
+@Composable
+private fun SettingIconButton(
+    icon: ImageVector,
+    contentDescription: String? = null,
+    isEnabled: Boolean = true,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    IconButton(onClick = onClick, modifier = modifier) {
+        Icon(
+            icon,
+            contentDescription = contentDescription,
+            tint = if (isEnabled) Color.Black else Color.Gray
+        )
     }
 }

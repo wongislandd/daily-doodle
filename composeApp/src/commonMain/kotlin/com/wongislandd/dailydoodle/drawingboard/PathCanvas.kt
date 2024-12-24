@@ -16,6 +16,8 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import com.wongislandd.nexus.events.EventBus
 import com.wongislandd.nexus.events.UiEvent
@@ -66,14 +68,16 @@ fun PathsCanvas(
         pathState.paths.fastForEach { pathData ->
             drawPath(
                 path = pathData.offsets,
-                color = pathData.color
+                color = pathData.color,
+                thickness = pathData.thickness
             )
         }
-        // Draw current ath
-        pathState.currentPath?.let {
+        // Draw current path
+        pathState.currentPath?.let { currentPathData ->
             drawPath(
-                path = it.offsets,
-                color = it.color
+                path = currentPathData.offsets,
+                color = currentPathData.color,
+                thickness = currentPathData.thickness
             )
         }
     }
@@ -82,7 +86,7 @@ fun PathsCanvas(
 private fun DrawScope.drawPath(
     path: List<Offset>,
     color: Color,
-    thickness: Float = 10f
+    thickness: Dp = 10.dp
 ) {
     val smoothedPath = Path().apply {
         if (path.isNotEmpty()) {
@@ -108,7 +112,7 @@ private fun DrawScope.drawPath(
         path = smoothedPath,
         color = color,
         style = Stroke(
-            width = thickness,
+            width = thickness.toPx(),
             cap = StrokeCap.Round,
             join = StrokeJoin.Round
         )

@@ -2,9 +2,11 @@ package com.wongislandd.dailydoodle.drawingboard
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.wongislandd.nexus.events.UiEvent
 
-data class PathData(val offsets: List<Offset>, val color: Color)
+data class PathData(val offsets: List<Offset>, val thickness: Dp = 10.dp, val color: Color)
 
 class CanvasPathSlice : CanvasViewModelSlice() {
 
@@ -37,7 +39,8 @@ class CanvasPathSlice : CanvasViewModelSlice() {
         canvas.updatePathState(
             currentPathState.copy(
                 currentPath = currentPath.copy(
-                    offsets = currentPath.offsets + offset
+                    offsets = currentPath.offsets + offset,
+                    thickness = canvas.state.value.settings.brushSettings.getThickness()
                 )
             )
         )
@@ -49,7 +52,8 @@ class CanvasPathSlice : CanvasViewModelSlice() {
             currentPathState.copy(
                 currentPath = PathData(
                     offsets = emptyList(),
-                    color = canvas.state.value.settings.selectedColor
+                    color = canvas.state.value.settings.getBrushColor(),
+                    thickness = canvas.state.value.settings.brushSettings.getThickness()
                 )
             )
         )

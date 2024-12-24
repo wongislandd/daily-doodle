@@ -7,7 +7,8 @@ fun Modifier.conditionallyChain(condition: Boolean, modifier: Modifier): Modifie
     return if (condition) this.then(modifier) else this
 }
 
-fun <T> MutableList<T>.addWithLimit(element: T, maxSize: Int): MutableList<T> {
+fun <T> MutableList<T>.addUniqueWithLimit(element: T, maxSize: Int): MutableList<T> {
+    this.remove(element)
     this.add(element)
     if (this.size > maxSize) {
         this.removeAt(0) // Removes the first element (oldest)

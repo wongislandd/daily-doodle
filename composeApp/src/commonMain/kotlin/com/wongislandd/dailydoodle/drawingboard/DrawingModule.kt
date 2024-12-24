@@ -9,5 +9,5 @@ val drawingModule = module {
     factoryOf(::Canvas)
     factoryOf(::CanvasPathSlice)
     factoryOf(::DrawingBoardScreenStateSlice)
-    factoryOf(::ColorSlice)
+    factoryOf(::BrushControllerSlice)
 }
