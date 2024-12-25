@@ -3,6 +3,7 @@ package com.wongislandd.dailydoodle.drawingboard
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -22,6 +23,7 @@ import androidx.compose.ui.util.fastForEach
 import com.wongislandd.nexus.events.EventBus
 import com.wongislandd.nexus.events.UiEvent
 import com.wongislandd.nexus.events.sendEvent
+import com.wongislandd.nexus.util.noIndicationClickable
 import kotlin.math.abs
 
 @Composable
@@ -31,35 +33,38 @@ fun PathsCanvas(
     modifier: Modifier = Modifier
 ) {
     val coroutineScope = rememberCoroutineScope()
+    val sendEvent: (UiEvent) -> Unit = { event ->
+        coroutineScope.sendEvent(
+            uiEventBus,
+            event
+        )
+    }
     Canvas(modifier = modifier
         .clipToBounds()
         .fillMaxSize()
         .background(Color.White)
+        // Account for single taps
+        .pointerInput(true) {
+            detectTapGestures(
+                onTap = { offset ->
+                    sendEvent(DrawingAction.OnTap(offset))
+                }
+            )
+        }
+        // Account for drags
         .pointerInput(true) {
             detectDragGestures(
                 onDragStart = {
-                    coroutineScope.sendEvent(
-                        uiEventBus,
-                        DrawingAction.OnNewPathStart
-                    )
+                    sendEvent(DrawingAction.OnNewPathStart)
                 },
                 onDrag = { change, _ ->
-                    coroutineScope.sendEvent(
-                        uiEventBus,
-                        DrawingAction.OnDraw(change.position)
-                    )
+                    sendEvent(DrawingAction.OnDraw(change.position))
                 },
                 onDragEnd = {
-                    coroutineScope.sendEvent(
-                        uiEventBus,
-                        DrawingAction.OnNewPathEnd
-                    )
+                    sendEvent(DrawingAction.OnNewPathEnd)
                 },
                 onDragCancel = {
-                    coroutineScope.sendEvent(
-                        uiEventBus,
-                        DrawingAction.OnNewPathEnd
-                    )
+                    sendEvent(DrawingAction.OnNewPathEnd)
                 }
             )
         }
@@ -91,6 +96,11 @@ fun DrawScope.drawPath(
 ) {
     val smoothedPath = Path().apply {
         if (path.isNotEmpty()) {
+            if (path.size == 1) {
+                // Draw a dot if there's only one offset in the path, no need to link lines
+                drawCircle(color, radius = thickness.toPx() / 2, center = path.first())
+                return@apply
+            }
             moveTo(path.first().x, path.first().y)
             val smoothness = 2
             for (i in 1 until path.lastIndex) {

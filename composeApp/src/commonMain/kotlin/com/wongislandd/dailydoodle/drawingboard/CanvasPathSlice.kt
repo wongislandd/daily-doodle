@@ -15,11 +15,25 @@ class CanvasPathSlice : CanvasViewModelSlice() {
             when (event) {
                 DrawingAction.OnNewPathStart -> onNewPathStart()
                 is DrawingAction.OnDraw -> onDraw(event.offset)
+                is DrawingAction.OnTap -> onTap(event.offset)
                 DrawingAction.OnNewPathEnd -> onNewPathEnd()
                 DrawingAction.OnUndo -> onUndo()
                 DrawingAction.OnRedo -> onRedo()
             }
         }
+    }
+
+    private fun onTap(offset: Offset) {
+        val currentPathState = canvas.state.value.pathState
+        canvas.updatePathState(
+            currentPathState.copy(
+                paths = canvas.state.value.pathState.paths + PathData(
+                    offsets = listOf(offset),
+                    color = canvas.state.value.settings.getBrushColor(),
+                    thickness = canvas.state.value.settings.brushSettings.getThickness()
+                )
+            )
+        )
     }
 
     private fun onNewPathEnd() {
