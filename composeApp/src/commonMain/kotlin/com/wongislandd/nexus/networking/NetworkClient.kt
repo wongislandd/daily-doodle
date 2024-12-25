@@ -9,37 +9,50 @@ import io.ktor.client.call.body
 import io.ktor.client.network.sockets.SocketTimeoutException
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.get
+import io.ktor.client.request.post
 import io.ktor.client.request.url
 import io.ktor.util.network.UnresolvedAddressException
-import io.ktor.util.reflect.TypeInfo
 import kotlinx.serialization.SerializationException
+
+enum class HttpMethod {
+    GET, POST, PUT, DELETE
+}
 
 abstract class NetworkClient(val httpClient: HttpClient) {
 
     suspend inline fun <reified T> makeRequest(
         endpoint: String,
-        typeInfo: TypeInfo,
+        httpMethod: HttpMethod = HttpMethod.GET,
         builder: HttpRequestBuilder.() -> Unit = {},
     ): Resource<T> {
-        return makeNetworkRequest(endpoint, typeInfo, builder)
+        return makeNetworkRequest(endpoint, httpMethod, builder)
     }
 
     suspend inline fun <reified T> makeNetworkRequest(
         endpoint: String,
-        typeInfo: TypeInfo,
+        httpMethod: HttpMethod,
         builder: HttpRequestBuilder.() -> Unit = {}
     ): Resource<T> {
         try {
-            val response = httpClient.get {
-                url(endpoint)
-                builder()
+            val response = when (httpMethod) {
+                HttpMethod.GET -> httpClient.get {
+                    url(endpoint)
+                    builder()
+                }
+
+                HttpMethod.POST -> httpClient.post {
+                    url(endpoint)
+                    builder()
+                }
+                else -> throw IllegalArgumentException("Unsupported HTTP method")
             }
             val newValue = when (response.status.value) {
                 in 200..299 -> {
                     // This is not making use of ktor client, find a way. It seemed faster.
-                    val data: T = response.body(typeInfo)
+                    val data: T = response.body()
                     Resource.Success(data)
                 }
+
                 400 -> Resource.Error(ErrorType.BAD_REQUEST)
                 401 -> Resource.Error(ErrorType.UNAUTHORIZED)
                 403 -> Resource.Error(ErrorType.FORBIDDEN)

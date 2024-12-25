@@ -12,5 +12,8 @@ val drawingModule = module {
     factoryOf(::DrawingBoardScreenStateSlice)
     factoryOf(::BrushControllerSlice)
     factoryOf(::ExportSlice)
+    factoryOf(::CanvasSavingSlice)
+    singleOf(::CanvasRepository)
+    singleOf(::CanvasStateAdapter)
     singleOf(::NetworkCanvasStateAdapter)
 }

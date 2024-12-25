@@ -4,7 +4,7 @@ import co.touchlab.kermit.Logger
 
 class DoodleSubmissionService(private val requestContextProvider: RequestContextProvider) {
 
-    fun submitDoodle() {
+    fun saveCanvas(canvas: NetworkCanvasState) {
         Logger.i(tag = "DoodleSubmissionService", null) {
             "submitDoodle"
         }

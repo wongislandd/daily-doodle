@@ -9,6 +9,7 @@ class DrawingBoardViewModel(
     val drawingBoardScreenStateSlice: DrawingBoardScreenStateSlice,
     canvas: Canvas,
     canvasPathSlice: CanvasPathSlice,
+    canvasSavingSlice: CanvasSavingSlice,
     exportSlice: ExportSlice,
     canvasSettingsSlice: BrushControllerSlice,
     uiEventBus: EventBus<UiEvent>,
@@ -20,6 +21,7 @@ class DrawingBoardViewModel(
             canvasSettingsSlice,
             canvasPathSlice,
             drawingBoardScreenStateSlice,
+            canvasSavingSlice,
             exportSlice
         ).forEach { slice ->
             slice.provideCanvas(canvas)

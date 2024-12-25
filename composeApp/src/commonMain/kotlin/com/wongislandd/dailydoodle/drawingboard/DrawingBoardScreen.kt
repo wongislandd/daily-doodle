@@ -100,7 +100,10 @@ fun DrawingBoardScreen(modifier: Modifier = Modifier) {
             }
         }
         if (screenState.shareState.isShareEnabled) {
-            IconButton(onClick = { onSendEvent(ImageExportRequest(canvasSize)) }) {
+            IconButton(onClick = {
+//                onSendEvent(ImageExportRequest(canvasSize))
+                onSendEvent(SaveCanvas)
+            }) {
                 Icon(
                     Icons.Default.Share,
                     tint = MaterialTheme.colors.onPrimary,
