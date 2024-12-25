@@ -2,36 +2,11 @@ package com.wongislandd.dailydoodle.drawingboard
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
+import com.wongislandd.dailydoodle.DrawingUtencils
 import com.wongislandd.nexus.util.addUniqueWithLimit
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
-
-enum class DrawingUtencils(val displayName: String, val defaultThickness: Dp) {
-    PENCIL("pencil", 10.dp),
-    ERASER("eraser", 20.dp)
-}
-
-data class PathState(
-    val paths: List<PathData> = emptyList(),
-    val currentPath: PathData? = null
-)
-
-data class BrushSettings(
-    val selectedTool: DrawingUtencils = DrawingUtencils.PENCIL,
-    val selectedPencilThickness: Dp = DrawingUtencils.PENCIL.defaultThickness,
-    val selectedEraserThickness: Dp = DrawingUtencils.ERASER.defaultThickness,
-    val selectedColor: Color = Color.Black
-)
-
-data class CanvasSettings(
-    val brushSettings: BrushSettings = BrushSettings(),
-    val colorHistory: List<Color> = emptyList(),
-    val thicknessHistory: List<Dp> = emptyList(),
-    val isUndoAvailable: Boolean = false,
-    val isRedoAvailable: Boolean = false
-)
 
 fun CanvasSettings.getBrushColor(): Color {
     return if (brushSettings.selectedTool == DrawingUtencils.ERASER) {
@@ -46,11 +21,6 @@ fun BrushSettings.getThickness(): Dp {
     }
 }
 
-data class CanvasState(
-    val settings: CanvasSettings = CanvasSettings(),
-    val pathState: PathState = PathState(),
-    val undoStack: List<PathData> = emptyList()
-)
 
 class Canvas {
 

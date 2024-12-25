@@ -1,12 +1,8 @@
 package com.wongislandd.dailydoodle.drawingboard
 
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.wongislandd.nexus.events.UiEvent
 
-data class PathData(val offsets: List<Offset>, val thickness: Dp = 10.dp, val color: Color)
 
 class CanvasPathSlice : CanvasViewModelSlice() {
 
