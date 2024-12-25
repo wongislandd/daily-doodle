@@ -205,6 +205,7 @@ private fun SettingBottomSheet(
                         Text(
                             text = it,
                             style = MaterialTheme.typography.h6,
+                            color = Color.Black,
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.padding(16.dp)
                         )
@@ -234,7 +235,7 @@ private fun ThicknessSelectionBottomSheet(
 
     SettingBottomSheet(
         isVisible = isVisible,
-        title = "Select ${currentTool.displayName} thickness",
+        title = "Select ${currentTool.displayName} size",
         onDismissRequest = onDismissRequest,
         modifier = modifier
     ) {
@@ -242,19 +243,21 @@ private fun ThicknessSelectionBottomSheet(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.height(300.dp).fillMaxWidth().padding(16.dp)
         ) {
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.size(16.dp))
             // Dynamic Preview
-            when (currentTool) {
-                DrawingUtencils.PENCIL -> ThicknessPreview(
-                    thickness = tentativeThickness,
-                    color = currentColor
-                )
-
-                DrawingUtencils.ERASER -> ThicknessPreview(
-                    thickness = tentativeThickness,
-                    color = Color.White,
-                    modifier = Modifier.border(2.dp, Color.Black, shape = CircleShape)
-                )
+            Box(modifier = Modifier.weight(1f)) {
+                when (currentTool) {
+                    DrawingUtencils.PENCIL -> ThicknessPreview(
+                        thickness = tentativeThickness,
+                        color = currentColor,
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                    DrawingUtencils.ERASER -> ThicknessPreview(
+                        thickness = tentativeThickness,
+                        color = Color.White,
+                        modifier = Modifier.border(2.dp, Color.Black, shape = CircleShape).align(Alignment.Center)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -436,6 +439,7 @@ private fun LabeledComponent(
         Text(
             text = label,
             style = MaterialTheme.typography.body2,
+            color = Color.Black,
             fontWeight = FontWeight.Bold,
         )
         content()

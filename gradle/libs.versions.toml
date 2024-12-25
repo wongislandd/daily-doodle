@@ -26,6 +26,7 @@ okio = "3.9.1"
 crashlytics = "3.0.2"
 google-services = "4.4.2"
 colorpicker="1.1.2"
+kotlin-datetime="0.6.1"
 
 #Gitlive
 firebase-gitlive-sdk = "2.1.0"
@@ -69,6 +70,8 @@ gitlive-firebase-kotlin-analytics = { module = "dev.gitlive:firebase-analytics",
 gitlive-firebase-kotlin-performance = { module = "dev.gitlive:firebase-perf", version.ref = "firebase-gitlive-sdk" }
 gitlive-firebase-kotlin-installations = { module = "dev.gitlive:firebase-installations", version.ref = "firebase-gitlive-sdk" }
 compose-colorpicker = { module = "com.github.skydoves:colorpicker-compose", version.ref = "colorpicker" }
+kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlin-datetime" }
+
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

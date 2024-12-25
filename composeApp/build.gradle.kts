@@ -80,6 +80,7 @@ kotlin {
             implementation(libs.koin.composeViewModel)
             implementation(libs.kermit)
             implementation(libs.compose.colorpicker)
+            implementation(libs.kotlinx.datetime)
         }
         nativeMain.dependencies {
             implementation(libs.ktor.client.darwin)
