@@ -8,9 +8,17 @@ data class ShareState(
     val isShareEnabled: Boolean = false,
 )
 
+enum class SaveState {
+    AVAILABLE,
+    SAVING,
+    SAVED,
+    FAILED
+}
+
 data class DrawingBoardScreenState(
     val canvasState: Resource<CanvasState> = Resource.Loading(),
     val isColorPickerShown: Boolean = false,
     val isThicknessSelectorShown: Boolean = false,
     val shareState: ShareState = ShareState(),
+    val saveState: SaveState = SaveState.AVAILABLE
 )

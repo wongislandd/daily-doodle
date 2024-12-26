@@ -1,5 +1,7 @@
 package com.wongislandd.nexus.util
 
+object Empty
+
 sealed class Resource<T>(
     open val data: T? = null
 ) {

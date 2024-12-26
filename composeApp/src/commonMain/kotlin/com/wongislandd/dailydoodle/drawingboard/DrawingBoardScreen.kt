@@ -1,5 +1,6 @@
 package com.wongislandd.dailydoodle.drawingboard
 
+import CloudUpload
 import Eraser
 import Pencil
 import Redo
@@ -38,8 +39,10 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -95,14 +98,13 @@ fun DrawingBoardScreen(modifier: Modifier = Modifier) {
             IconButton(onClick = {}) {
                 CircularProgressIndicator(
                     color = MaterialTheme.colors.onPrimary,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(48.dp)
                 )
             }
         }
         if (screenState.shareState.isShareEnabled) {
             IconButton(onClick = {
-//                onSendEvent(ImageExportRequest(canvasSize))
-                onSendEvent(SaveCanvas)
+                onSendEvent(ImageExportRequest(canvasSize))
             }) {
                 Icon(
                     Icons.Default.Share,
@@ -111,6 +113,7 @@ fun DrawingBoardScreen(modifier: Modifier = Modifier) {
                 )
             }
         }
+        SaveAction(screenState.saveState, onSaveClicked = { onSendEvent(SaveCanvas) })
     }) {
         when (val canvasState = screenState.canvasState) {
             is Resource.Success -> {
@@ -159,6 +162,54 @@ fun DrawingBoardScreen(modifier: Modifier = Modifier) {
 
             is Resource.Loading -> {
                 // Handle loading
+            }
+        }
+    }
+}
+
+@Composable
+private fun SaveAction(
+    saveState: SaveState,
+    onSaveClicked: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    when (saveState) {
+        SaveState.AVAILABLE -> {
+            IconButton(onClick = onSaveClicked, modifier = modifier) {
+                Icon(
+                    CloudUpload,
+                    tint = MaterialTheme.colors.onPrimary,
+                    contentDescription = "Save Drawing"
+                )
+            }
+        }
+
+        SaveState.SAVING -> {
+            IconButton(onClick = {}, modifier = modifier) {
+                CircularProgressIndicator(
+                    color = MaterialTheme.colors.onPrimary,
+                    modifier = modifier.size(24.dp)
+                )
+            }
+        }
+
+        SaveState.SAVED -> {
+            IconButton(onClick = {}, modifier = modifier) {
+                Icon(
+                    Icons.Default.CheckCircle,
+                    tint = MaterialTheme.colors.onPrimary,
+                    contentDescription = "Saving succeeded"
+                )
+            }
+        }
+
+        SaveState.FAILED -> {
+            IconButton(onClick = {}, modifier = modifier) {
+                Icon(
+                    Icons.Default.Warning,
+                    tint = MaterialTheme.colors.onPrimary,
+                    contentDescription = "Saving failed"
+                )
             }
         }
     }
@@ -256,10 +307,12 @@ private fun ThicknessSelectionBottomSheet(
                         color = currentColor,
                         modifier = Modifier.align(Alignment.Center)
                     )
+
                     DrawingUtencils.ERASER -> ThicknessPreview(
                         thickness = tentativeThickness,
                         color = Color.White,
-                        modifier = Modifier.border(2.dp, Color.Black, shape = CircleShape).align(Alignment.Center)
+                        modifier = Modifier.border(2.dp, Color.Black, shape = CircleShape)
+                            .align(Alignment.Center)
                     )
                 }
             }

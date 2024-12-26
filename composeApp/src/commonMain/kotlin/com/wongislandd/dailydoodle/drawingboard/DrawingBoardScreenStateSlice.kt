@@ -55,6 +55,11 @@ class DrawingBoardScreenStateSlice(shareService: ShareService) : CanvasViewModel
                     shareState = event.shareState
                 )
             }
+            is SaveStateUpdate -> _screenState.update {
+                it.copy(
+                    saveState = event.saveState
+                )
+            }
         }
     }
 
