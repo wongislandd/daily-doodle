@@ -9,6 +9,7 @@ plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.buildkonfig)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 buildkonfig {
@@ -53,6 +54,7 @@ kotlin {
     sourceSets {
         commonMain.dependencies {
             // put your Multiplatform dependencies here
+            implementation(libs.kotlinx.serialization)
         }
     }
 }

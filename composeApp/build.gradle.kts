@@ -11,6 +11,7 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.google.services)
     alias(libs.plugins.crashlytics)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 kotlin {
