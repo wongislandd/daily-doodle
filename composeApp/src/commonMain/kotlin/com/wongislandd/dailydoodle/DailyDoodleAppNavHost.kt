@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.wongislandd.dailydoodle.drawingboard.DrawingBoardScreen
+import com.wongislandd.dailydoodle.explore.ExploreScreen
 import com.wongislandd.dailydoodle.home.HomeScreen
 import com.wongislandd.navigation.NavigationItemKey
 import com.wongislandd.navigation.supportedNavigationItems
@@ -16,7 +17,7 @@ import com.wongislandd.nexus.navigation.LocalNavHostController
 @Composable
 fun DailyDoodleAppNavHost(
     modifier: Modifier = Modifier,
-    startDestination: NavigationItemKey = NavigationItemKey.DRAWING_BOARD
+    startDestination: NavigationItemKey = NavigationItemKey.HOME
 ) {
     val navController = LocalNavHostController.current
     val startingDestination = supportedNavigationItems[startDestination]
@@ -69,6 +70,11 @@ fun DailyDoodleAppNavHost(
                 NavigationItemKey.DRAWING_BOARD -> {
                     composable(route = navigationItem.completeRoute) {
                         DrawingBoardScreen()
+                    }
+                }
+                NavigationItemKey.EXPLORE -> {
+                    composable(route = navigationItem.completeRoute) {
+                        ExploreScreen()
                     }
                 }
             }

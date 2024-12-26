@@ -10,6 +10,7 @@ import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.request.receive
+import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
@@ -45,17 +46,26 @@ val RequestContextPlugin = createApplicationPlugin(name = "RequestContextPlugin"
     }
 }
 
-private fun Application.defaultModule() {
+object PersistentStorage {
+    val canvasSubmissions = mutableListOf<NetworkCanvasState>()
+}
 
+private fun Application.defaultModule() {
     routing {
         get("/") {
             call.respondText("Ktor: ${Greeting().greet()}")
         }
+        get("/canvas") {
+            val doodleSubmissionService = call.scope.get<DoodleSubmissionService>()
+            val canvas: List<NetworkCanvasState> = doodleSubmissionService.getCanvas()
+            call.respond(canvas)
+        }
+
         post("/canvas") {
             val canvas = call.receive<NetworkCanvasState>()
             val doodleSubmissionService = call.scope.get<DoodleSubmissionService>()
             doodleSubmissionService.saveCanvas(canvas)
-            call.respondText("Doodle submitted")
+            call.respondText("true")
         }
     }
 }
