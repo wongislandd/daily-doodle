@@ -5,12 +5,16 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.wongislandd.dailydoodle.drawingboard.DrawingBoardScreen
 import com.wongislandd.dailydoodle.explore.ExploreScreen
 import com.wongislandd.dailydoodle.home.HomeScreen
+import com.wongislandd.dailydoodle.prompting.PromptScreen
 import com.wongislandd.navigation.NavigationItemKey
+import com.wongislandd.navigation.PROMPT_ARG
 import com.wongislandd.navigation.supportedNavigationItems
 import com.wongislandd.nexus.navigation.LocalNavHostController
 
@@ -68,13 +72,24 @@ fun DailyDoodleAppNavHost(
                 }
 
                 NavigationItemKey.DRAWING_BOARD -> {
-                    composable(route = navigationItem.completeRoute) {
-                        DrawingBoardScreen()
+                    composable(route = navigationItem.completeRoute,
+                        arguments = listOf(
+                            navArgument(PROMPT_ARG) { type = NavType.StringType; nullable = true }
+                        )) {
+                        val prompt = it.arguments?.getString(PROMPT_ARG)
+                        DrawingBoardScreen(prompt = prompt)
                     }
                 }
+
                 NavigationItemKey.EXPLORE -> {
                     composable(route = navigationItem.completeRoute) {
                         ExploreScreen()
+                    }
+                }
+
+                NavigationItemKey.PROMPT_GENERATION -> {
+                    composable(route = navigationItem.completeRoute) {
+                        PromptScreen()
                     }
                 }
             }

@@ -3,6 +3,7 @@ package com.wongislandd.dailydoodle.di
 import com.wongislandd.dailydoodle.AppViewModel
 import com.wongislandd.dailydoodle.drawingboard.drawingModule
 import com.wongislandd.dailydoodle.explore.exploreModule
+import com.wongislandd.dailydoodle.prompting.promptModule
 import com.wongislandd.dailydoodle.sharing.ShareService
 import com.wongislandd.dailydoodle.sharing.ShareServiceImpl
 import com.wongislandd.navigation.NavigationSlice
@@ -23,5 +24,5 @@ fun appModule(appContext: Any? = null) = module {
 
 fun initializeKoin(context: Any? = null) =
     startKoin {
-        modules(*infraModule.toTypedArray(), appModule(context), drawingModule, exploreModule)
+        modules(*infraModule.toTypedArray(), appModule(context), drawingModule, exploreModule, promptModule)
     }

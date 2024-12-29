@@ -28,6 +28,14 @@ class Canvas {
         MutableStateFlow(CanvasState())
     val state: StateFlow<CanvasState> = _state
 
+    fun updateCanvasTitle(title: String) {
+        _state.update {
+            it.copy(canvasMetadata = it.canvasMetadata.copy(
+                title = title
+            ))
+        }
+    }
+
     fun updateSelectedColor(color: Color) {
         _state.update {
             val mutableColorHistory = it.settings.colorHistory.toMutableList()

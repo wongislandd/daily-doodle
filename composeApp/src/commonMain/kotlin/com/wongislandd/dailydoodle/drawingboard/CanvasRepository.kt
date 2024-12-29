@@ -14,7 +14,7 @@ class CanvasRepository(okHttpClient: HttpClient) : NetworkClient(okHttpClient) {
     // Fire and forget, should probably expect some signal back
     suspend fun saveCanvas(networkCanvasState: NetworkCanvasState): Resource<Unit> {
         return makeRequest<Unit>(
-            "http://localhost:8080/canvas",
+            "canvas",
             HttpMethod.POST
         ) {
             contentType(ContentType.Application.Json)
@@ -24,7 +24,7 @@ class CanvasRepository(okHttpClient: HttpClient) : NetworkClient(okHttpClient) {
 
     suspend fun getCanvas(): Resource<List<NetworkCanvasState>> {
         return makeRequest(
-            "http://localhost:8080/canvas",
+            "canvas",
             HttpMethod.GET
         )
     }

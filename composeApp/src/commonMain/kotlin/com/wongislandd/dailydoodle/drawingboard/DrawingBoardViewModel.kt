@@ -7,7 +7,7 @@ import com.wongislandd.nexus.viewmodel.SliceableViewModel
 
 class DrawingBoardViewModel(
     val drawingBoardScreenStateSlice: DrawingBoardScreenStateSlice,
-    canvas: Canvas,
+    private val canvas: Canvas,
     canvasPathSlice: CanvasPathSlice,
     canvasSavingSlice: CanvasSavingSlice,
     exportSlice: ExportSlice,
@@ -27,5 +27,9 @@ class DrawingBoardViewModel(
             slice.provideCanvas(canvas)
             registerSlices(slice)
         }
+    }
+
+    fun registerCanvasTitle(title: String) {
+        canvas.updateCanvasTitle(title)
     }
 }

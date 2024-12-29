@@ -81,8 +81,11 @@ import org.koin.core.annotation.KoinExperimentalAPI
 
 @OptIn(KoinExperimentalAPI::class)
 @Composable
-fun DrawingBoardScreen(modifier: Modifier = Modifier) {
+fun DrawingBoardScreen(prompt: String? = null, modifier: Modifier = Modifier) {
     val viewModel = koinViewModel<DrawingBoardViewModel>()
+    prompt?.also {
+        viewModel.registerCanvasTitle(it)
+    }
     val screenState by viewModel.drawingBoardScreenStateSlice.screenState.collectAsState()
     var canvasSize by remember { mutableStateOf(Size(0f, 0f)) }
     val coroutineScope = rememberCoroutineScope()
@@ -93,7 +96,7 @@ fun DrawingBoardScreen(modifier: Modifier = Modifier) {
             )
         }
     }
-    DailyDoodleTopAppBar(title = "Drawing Board", actions = {
+    DailyDoodleTopAppBar(title = prompt ?: "Drawing Board", actions = {
         if (screenState.shareState.isSharing) {
             IconButton(onClick = {}) {
                 CircularProgressIndicator(

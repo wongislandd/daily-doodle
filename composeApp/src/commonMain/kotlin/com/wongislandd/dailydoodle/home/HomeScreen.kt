@@ -29,6 +29,14 @@ fun HomeScreen(modifier: Modifier = Modifier) {
                 Button(onClick = {
                     appViewModel.navigate(
                         navController,
+                        NavigationItemKey.PROMPT_GENERATION
+                    )
+                }) {
+                    Text("Go to Prompt Generation")
+                }
+                Button(onClick = {
+                    appViewModel.navigate(
+                        navController,
                         NavigationItemKey.DRAWING_BOARD
                     )
                 }) {

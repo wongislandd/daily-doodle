@@ -3,9 +3,11 @@ package com.wongislandd.dailydoodle.explore
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -62,6 +64,12 @@ private fun ExploreScreenContent(
     uiEventBus: EventBus<UiEvent>,
     modifier: Modifier = Modifier
 ) {
+    if (canvasPreviews.isEmpty()) {
+        // handle empty state
+        Box(modifier = Modifier.fillMaxSize()) {
+            Text(text = "No canvases to show", style = MaterialTheme.typography.h6, modifier = Modifier.align(Alignment.Center))
+        }
+    }
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         contentPadding = PaddingValues(top = 16.dp),

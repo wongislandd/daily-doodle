@@ -16,6 +16,7 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.routing
 import kotlinx.serialization.json.Json
+import org.koin.ktor.ext.inject
 import org.koin.ktor.plugin.Koin
 import org.koin.ktor.plugin.scope
 
@@ -36,7 +37,8 @@ fun Application.main() {
         })
     }
     install(RequestContextPlugin)
-    defaultModule()
+    canvasModule()
+    promptModule()
 }
 
 val RequestContextPlugin = createApplicationPlugin(name = "RequestContextPlugin") {
@@ -50,7 +52,16 @@ object PersistentStorage {
     val canvasSubmissions = mutableListOf<NetworkCanvasState>()
 }
 
-private fun Application.defaultModule() {
+private fun Application.promptModule() {
+    val promptService : PromptService by inject()
+    routing {
+        get("/prompt") {
+            call.respondText(promptService.getPrompt())
+        }
+    }
+}
+
+private fun Application.canvasModule() {
     routing {
         get("/") {
             call.respondText("Ktor: ${Greeting().greet()}")
