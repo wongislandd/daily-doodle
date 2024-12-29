@@ -92,6 +92,7 @@ fun DrawScope.drawPathState(pathState: PathState) {
         )
     }
 }
+
 fun DrawScope.drawPath(
     path: List<Offset>,
     color: Color,
