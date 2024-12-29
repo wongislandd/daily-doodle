@@ -1,12 +1,15 @@
 package com.wongislandd.dailydoodle
 
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class NetworkCanvasState(
     val settings: NetworkCanvasSettings,
     val paths: List<NetworkPathData>,
-    val undoStack: List<NetworkPathData>
+    val undoStack: List<NetworkPathData>,
+    val canvasMetadata: CanvasMetadata
 )
 
 @Serializable
@@ -34,3 +37,9 @@ enum class DrawingUtencils(val displayName: String, val defaultThickness: Float)
     PENCIL("pencil", 10f),
     ERASER("eraser", 20f)
 }
+
+@Serializable
+data class CanvasMetadata(
+    val date: Instant = Clock.System.now(),
+    val title: String = "Work of Art",
+)

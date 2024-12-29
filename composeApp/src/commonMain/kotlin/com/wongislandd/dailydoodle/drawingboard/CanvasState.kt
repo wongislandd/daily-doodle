@@ -4,10 +4,12 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.wongislandd.dailydoodle.CanvasMetadata
 import com.wongislandd.dailydoodle.DrawingUtencils
 
 data class CanvasState(
     val settings: CanvasSettings = CanvasSettings(),
+    val canvasMetadata: CanvasMetadata = CanvasMetadata(),
     val pathState: PathState = PathState(),
     val undoStack: List<PathData> = emptyList()
 )

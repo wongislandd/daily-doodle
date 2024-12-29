@@ -70,25 +70,28 @@ fun PathsCanvas(
         }
 
     ) {
-        // Draw previous paths
-        pathState.paths.fastForEach { pathData ->
-            drawPath(
-                path = pathData.offsets,
-                color = pathData.color,
-                thickness = pathData.thickness
-            )
-        }
-        // Draw current path
-        pathState.currentPath?.let { currentPathData ->
-            drawPath(
-                path = currentPathData.offsets,
-                color = currentPathData.color,
-                thickness = currentPathData.thickness
-            )
-        }
+        drawPathState(pathState)
     }
 }
 
+fun DrawScope.drawPathState(pathState: PathState) {
+    // Draw previous paths
+    pathState.paths.fastForEach { pathData ->
+        drawPath(
+            path = pathData.offsets,
+            color = pathData.color,
+            thickness = pathData.thickness
+        )
+    }
+    // Draw current path
+    pathState.currentPath?.let { currentPathData ->
+        drawPath(
+            path = currentPathData.offsets,
+            color = currentPathData.color,
+            thickness = currentPathData.thickness
+        )
+    }
+}
 fun DrawScope.drawPath(
     path: List<Offset>,
     color: Color,

@@ -18,7 +18,8 @@ class CanvasStateAdapter : Transformer<CanvasState, NetworkCanvasState> {
         return NetworkCanvasState(
             settings = canvasSettings,
             paths = paths,
-            undoStack = undoStack
+            undoStack = undoStack,
+            canvasMetadata = input.canvasMetadata
         )
     }
 
