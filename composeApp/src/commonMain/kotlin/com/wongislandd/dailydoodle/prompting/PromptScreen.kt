@@ -64,7 +64,8 @@ fun PromptScreen(modifier: Modifier = Modifier) {
                             appViewModel.navigate(
                                 localNavController,
                                 NavigationItemKey.DRAWING_BOARD,
-                                mapOf(PROMPT_ARG to screenState.promptRes.data)
+                                mapOf(PROMPT_ARG to screenState.promptRes.data),
+                                removeSelfFromStack = true
                             )
                             screenState.promptRes.data
                         }

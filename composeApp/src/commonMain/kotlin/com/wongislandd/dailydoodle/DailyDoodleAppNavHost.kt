@@ -21,7 +21,7 @@ import com.wongislandd.nexus.navigation.LocalNavHostController
 @Composable
 fun DailyDoodleAppNavHost(
     modifier: Modifier = Modifier,
-    startDestination: NavigationItemKey = NavigationItemKey.HOME
+    startDestination: NavigationItemKey = NavigationItemKey.DRAWING_BOARD
 ) {
     val navController = LocalNavHostController.current
     val startingDestination = supportedNavigationItems[startDestination]

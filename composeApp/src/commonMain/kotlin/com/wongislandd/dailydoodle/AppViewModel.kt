@@ -21,12 +21,14 @@ class AppViewModel(
     fun navigate(
         navigationController: NavController,
         navigationKey: NavigationItemKey,
-        args: Map<String, Any?> = emptyMap()
+        args: Map<String, Any?> = emptyMap(),
+        removeSelfFromStack: Boolean = false
     ) {
         navigationSlice.navigationHelper.navigate(
             navigationController,
             navigationKey.name,
-            args
+            args,
+            removeSelfFromStack
         )
     }
 }

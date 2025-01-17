@@ -93,6 +93,25 @@ kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", versi
 
 
 [bundles]
+nexus = [
+    "kermit",
+    "koin-core",
+    "koin-compose",
+    "koin-composeViewModel",
+    "koin-ktor",
+    "androidx-lifecycle-viewmodel",
+    "androidx-lifecycle-runtime-compose",
+    "ktor-client-core",
+    "ktor-client-json",
+    "ktor-client-logging",
+    "ktor-client-serialization",
+    "ktor-client-content-negotiation",
+    "ktor-serialization-kotlinx-json",
+    "kotlinx-serialization",
+    "kotlinx-datetime",
+    "squareup-okio"
+]
+
 ktor = [
     "ktor-client-core",
     "ktor-client-json",
